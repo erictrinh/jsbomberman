@@ -11,19 +11,35 @@ init_game = ->
 			x: 25
 			y: 25
 		speed: 5
+		num_bombs: 3
+		controls:
+			up: 87
+			down: 83
+			left: 65
+			right: 68
+			drop: 88
 		up: false
 		down: false
 		right: false
 		left: false
+		dead: false
 	players[1] = 
 		position:
 			x: 475
 			y: 475
 		speed: 5
+		num_bombs: 3
+		controls:
+			up: 80
+			down: 186
+			left: 76
+			right: 222
+			drop: 191
 		up: false
 		down: false
 		right: false
 		left: false
+		dead: false
 
 game_logic = ->
 	for player in players
@@ -90,37 +106,57 @@ update_map = ->
 			strokeStyle: '#000'
 			strokeWidth: 1
 
-drop_bomb = (x_pos, y_pos) ->
-	t = setTimeout("explode_bomb()",2000)
-	bombs.push({x: x_pos, y: y_pos; timer: t})
+drop_bomb = (x_pos, y_pos, pid) ->
+	bombs.push({x: x_pos, y: y_pos, player_id: pid, timer: setTimeout("explode_bomb()",3000)})
 
-explode_bomb = ->
-	explosion(bombs[0].x, bombs[0].y)
-	bombs.splice(0,1)
+explode_bomb = (index=0) ->
+	clearTimeout(bombs[index].timer)
+	# replenish bomb supply
+	pid = bombs[index].player_id
+	players[pid].num_bombs += 1
+	explosion(bombs[index].x, bombs[index].y)
+	bombs.splice(index,1)
 
 explosion = (x_pos, y_pos) ->
 	shake_map(5)
+	
 	explosions.push({x: x_pos, y: y_pos})
+	
 	setTimeout("extinguish_explosion()",1000)
+
+chain_explosions = ->
+	for index in explosions2b
+		explode_bomb(index)
+	# clear the explosions2b array
+	explosions2b = []
 
 extinguish_explosion = ->
 	explosions.splice(0,1)
 
+# check if any of the explosions hit the players
 check_collisions = ->
-	for elem in explosions
-		if player_collision(players[0], elem) && player_collision(players[1], elem)
-			console.log('both players dead')
-			return true
-		else if player_collision(players[0], elem)
-			console.log('player 1 dead')
-			return true
-		else if player_collision(players[1], elem)
-			console.log('player 2 dead')
-			return true
-		else
-			return false
+	for explosion in explosions
+		for player in players
+			if player_collision(player, explosion)
+				player.dead = true
+	if players[0].dead && players[1].dead
+		console.log('both players dead')
+		return true
+	else if players[0].dead
+		console.log('player 1 dead')
+		return true
+	else if players[1].dead
+		console.log('player 2 dead')
+		return true
+	else
+		return false
 player_collision = (player, explosion) ->
 	if player.position.x-25/2 < explosion.x < player.position.x+25/2 || player.position.y-25/2 < explosion.y < player.position.y+25/2
+		return true
+	else
+		return false
+bomb_collision = (bomb, explosion) ->
+	if bomb.x-40/2 < explosion.x < bomb.x+40/2 || bomb.y-40/2 < explosion.y < bomb.y+40/2
 		return true
 	else
 		return false
@@ -141,65 +177,29 @@ $ ->
 
 $(document).bind 'keydown', (e) ->
 	unless event.metaKey
-		# keydown is w
-		if e.which is 87
-			players[0].up = true
-		# keydown is s
-		else if e.which is 83
-			players[0].down = true
-		# keydown is a
-		else if e.which is 65
-			players[0].left = true
-		# keydown is d
-		else if e.which is 68
-			players[0].right = true
-		# keydown is x
-		else if e.which is 88
-			drop_bomb(players[0].position.x, players[0].position.y)
-		
-		# keydown is p
-		if e.which is 80
-			players[1].up = true
-		# keydown is ;
-		else if e.which is 186
-			players[1].down = true
-		# keydown is l
-		else if e.which is 76
-			players[1].left = true
-		# keydown is '
-		else if e.which is 222
-			players[1].right = true
-		# keydown is comma
-		else if e.which is 191
-			drop_bomb(players[1].position.x, players[1].position.y)
-			
+		for player, player_id in players
+			if e.which is player.controls.up
+				player.up = true
+			else if e.which is player.controls.down
+				player.down = true
+			else if e.which is player.controls.left
+				player.left = true
+			else if e.which is player.controls.right
+				player.right = true
+			else if e.which is player.controls.drop
+				if player.num_bombs>0
+					drop_bomb(player.position.x, player.position.y, player_id)
+					player.num_bombs -= 1
 		return false
 .bind 'keyup', (e) ->
 	unless event.metaKey
-		# keydown is w
-		if e.which is 87
-			players[0].up = false
-		# keydown is s
-		else if e.which is 83
-			players[0].down = false
-		# keydown is a
-		else if e.which is 65
-			players[0].left = false
-		# keydown is d
-		else if e.which is 68
-			players[0].right = false
-			
-		# keydown is p
-		if e.which is 80
-			players[1].up = false
-		# keydown is l
-		else if e.which is 186
-			players[1].down = false
-		# keydown is ;
-		else if e.which is 76
-			players[1].left = false
-		# keydown is '
-		else if e.which is 222
-			players[1].right = false
-			
+		for player, player_id in players
+			if e.which is player.controls.up
+				player.up = false
+			else if e.which is player.controls.down
+				player.down = false
+			else if e.which is player.controls.left
+				player.left = false
+			else if e.which is player.controls.right
+				player.right = false
 		return false
