@@ -133,63 +133,64 @@ $ ->
 
 $(document).bind 'keydown', (e) ->
 	unless event.metaKey
-		# keyplayer1.down is w
+		# keydown is w
 		if e.which is 87
 			player1.up = true
-		# keyplayer1.down is s
+		# keydown is s
 		else if e.which is 83
 			player1.down = true
-		# keyplayer1.down is a
+		# keydown is a
 		else if e.which is 65
 			player1.left = true
-		# keyplayer1.down is d
+		# keydown is d
 		else if e.which is 68
 			player1.right = true
-		# keyplayer1.down is x
+		# keydown is x
 		else if e.which is 88
 			drop_bomb(player1.position.x, player1.position.y)
 		
-		# keyplayer2.down is w
+		# keydown is i
 		if e.which is 73
 			player2.up = true
-		# keyplayer2.down is s
+		# keydown is k
 		else if e.which is 75
 			player2.down = true
-		# keyplayer2.down is a
+		# keydown is j
 		else if e.which is 74
 			player2.left = true
-		# keyplayer2.down is d
+		# keydown is l
 		else if e.which is 76
 			player2.right = true
-		# keyplayer2.down is spacebar
+		# keydown is comma
 		else if e.which is 188
 			drop_bomb(player2.position.x, player2.position.y)
+			
 		return false
 $(document).bind 'keyup', (e) ->
 	unless event.metaKey
-		# keyplayer1.down is i
+		# keydown is w
 		if e.which is 87
 			player1.up = false
-		# keyplayer1.down is k
+		# keydown is s
 		else if e.which is 83
 			player1.down = false
-		# keyplayer1.down is j
+		# keydown is a
 		else if e.which is 65
 			player1.left = false
-		# keyplayer1.down is l
+		# keydown is d
 		else if e.which is 68
 			player1.right = false
 			
-		# keyplayer1.down is w
+		# keydown is i
 		if e.which is 73
 			player2.up = false
-		# keyplayer1.down is s
+		# keydown is k
 		else if e.which is 75
 			player2.down = false
-		# keyplayer1.down is a
+		# keydown is j
 		else if e.which is 74
 			player2.left = false
-		# keyplayer1.down is d
+		# keydown is l
 		else if e.which is 76
 			player2.right = false
 			
