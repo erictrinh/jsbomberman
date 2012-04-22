@@ -38,6 +38,15 @@ game_logic = ->
 		# keyplayers[0].down is d
 		else if player.right
 			player.position.x += player.speed
+		
+		if player.position.y < 25/2
+			player.position.y = 25/2
+		else if player.position.y > 475+25/2
+			player.position.y = 475+25/2
+		if player.position.x < 25/2
+			player.position.x = 25/2
+		else if player.position.x > 475+25/2
+			player.position.x = 475+25/2
 
 	update_map()
 	if check_collisions()
