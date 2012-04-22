@@ -20,7 +20,6 @@ player2 =
 	left: false
 
 bombs = new Array()
-bomb_timers = new Array()
 explosions = new Array()
 timer = null
 
@@ -116,18 +115,22 @@ extinguish_explosion = ->
 
 check_collisions = ->
 	for elem in explosions
-		if (player1.position.x-25/2 < elem.x < player1.position.x+25/2 || player1.position.y-25/2 < elem.y < player1.position.y+25/2) && (player2.position.x-25/2 < elem.x < player2.position.x+25/2 || player2.position.y-25/2 < elem.y < player2.position.y+25/2)
+		if player_collision(player1, elem) && player_collision(player2, elem)
 			console.log('both players dead')
 			return true
-		else if player1.position.x-25/2 < elem.x < player1.position.x+25/2 || player1.position.y-25/2 < elem.y < player1.position.y+25/2
+		else if player_collision(player1, elem)
 			console.log('player 1 dead')
 			return true
-		else if player2.position.x-25/2 < elem.x < player2.position.x+25/2 || player2.position.y-25/2 < elem.y < player2.position.y+25/2
+		else if player_collision(player2, elem)
 			console.log('player 2 dead')
 			return true
 		else
 			return false
-
+player_collision = (player, explosion) ->
+	if player.position.x-25/2 < explosion.x < player.position.x+25/2 || player.position.y-25/2 < explosion.y < player.position.y+25/2
+		return true
+	else
+		return false
 $ ->
 	game_logic()
 
@@ -149,16 +152,16 @@ $(document).bind 'keydown', (e) ->
 		else if e.which is 88
 			drop_bomb(player1.position.x, player1.position.y)
 		
-		# keydown is i
+		# keydown is p
 		if e.which is 80
 			player2.up = true
-		# keydown is k
+		# keydown is ;
 		else if e.which is 186
 			player2.down = true
-		# keydown is j
+		# keydown is l
 		else if e.which is 76
 			player2.left = true
-		# keydown is l
+		# keydown is '
 		else if e.which is 222
 			player2.right = true
 		# keydown is comma
@@ -166,7 +169,7 @@ $(document).bind 'keydown', (e) ->
 			drop_bomb(player2.position.x, player2.position.y)
 			
 		return false
-$(document).bind 'keyup', (e) ->
+.bind 'keyup', (e) ->
 	unless event.metaKey
 		# keydown is w
 		if e.which is 87
@@ -181,16 +184,16 @@ $(document).bind 'keyup', (e) ->
 		else if e.which is 68
 			player1.right = false
 			
-		# keydown is i
+		# keydown is p
 		if e.which is 80
 			player2.up = false
-		# keydown is k
+		# keydown is l
 		else if e.which is 186
 			player2.down = false
-		# keydown is j
+		# keydown is ;
 		else if e.which is 76
 			player2.left = false
-		# keydown is l
+		# keydown is '
 		else if e.which is 222
 			player2.right = false
 			
