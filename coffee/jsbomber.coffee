@@ -150,19 +150,19 @@ $(document).bind 'keydown', (e) ->
 			drop_bomb(player1.position.x, player1.position.y)
 		
 		# keydown is i
-		if e.which is 73
+		if e.which is 80
 			player2.up = true
 		# keydown is k
-		else if e.which is 75
+		else if e.which is 186
 			player2.down = true
 		# keydown is j
-		else if e.which is 74
+		else if e.which is 76
 			player2.left = true
 		# keydown is l
-		else if e.which is 76
+		else if e.which is 222
 			player2.right = true
 		# keydown is comma
-		else if e.which is 188
+		else if e.which is 191
 			drop_bomb(player2.position.x, player2.position.y)
 			
 		return false
@@ -182,16 +182,16 @@ $(document).bind 'keyup', (e) ->
 			player1.right = false
 			
 		# keydown is i
-		if e.which is 73
+		if e.which is 80
 			player2.up = false
 		# keydown is k
-		else if e.which is 75
+		else if e.which is 186
 			player2.down = false
 		# keydown is j
-		else if e.which is 74
+		else if e.which is 76
 			player2.left = false
 		# keydown is l
-		else if e.which is 76
+		else if e.which is 222
 			player2.right = false
 			
 		return false

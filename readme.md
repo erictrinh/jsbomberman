@@ -11,7 +11,7 @@ Player 1 controls:
 
 Player 2 controls:
 
-	movement: IJKL
-	drop a bomb: , (the comma key)
+	movement: PL;' (semicolon and single quote)
+	drop a bomb: / (forward slash)
 	
 If one or both players die, the game currently prints out who died in the console and stops the game.

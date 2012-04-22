@@ -174,15 +174,15 @@ $(document).bind('keydown', function(e) {
     } else if (e.which === 88) {
       drop_bomb(player1.position.x, player1.position.y);
     }
-    if (e.which === 73) {
+    if (e.which === 80) {
       player2.up = true;
-    } else if (e.which === 75) {
+    } else if (e.which === 186) {
       player2.down = true;
-    } else if (e.which === 74) {
-      player2.left = true;
     } else if (e.which === 76) {
+      player2.left = true;
+    } else if (e.which === 222) {
       player2.right = true;
-    } else if (e.which === 188) {
+    } else if (e.which === 191) {
       drop_bomb(player2.position.x, player2.position.y);
     }
     return false;
@@ -200,13 +200,13 @@ $(document).bind('keyup', function(e) {
     } else if (e.which === 68) {
       player1.right = false;
     }
-    if (e.which === 73) {
+    if (e.which === 80) {
       player2.up = false;
-    } else if (e.which === 75) {
+    } else if (e.which === 186) {
       player2.down = false;
-    } else if (e.which === 74) {
-      player2.left = false;
     } else if (e.which === 76) {
+      player2.left = false;
+    } else if (e.which === 222) {
       player2.right = false;
     }
     return false;
