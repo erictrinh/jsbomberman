@@ -82,8 +82,8 @@ update_map = ->
 			strokeWidth: 1
 
 drop_bomb = (x_pos, y_pos) ->
-	bombs.push({x: x_pos, y: y_pos})
-	setTimeout("explode_bomb()",2000)
+	t = setTimeout("explode_bomb()",2000)
+	bombs.push({x: x_pos, y: y_pos; timer: t})
 
 explode_bomb = ->
 	explosion(bombs[0].x, bombs[0].y)

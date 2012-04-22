@@ -106,11 +106,13 @@ update_map = function() {
 };
 
 drop_bomb = function(x_pos, y_pos) {
-  bombs.push({
+  var t;
+  t = setTimeout("explode_bomb()", 2000);
+  return bombs.push({
     x: x_pos,
-    y: y_pos
+    y: y_pos,
+    timer: t
   });
-  return setTimeout("explode_bomb()", 2000);
 };
 
 explode_bomb = function() {
