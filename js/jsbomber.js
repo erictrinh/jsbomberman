@@ -77,14 +77,14 @@ update_map = function() {
   for (_j = 0, _len1 = explosions.length; _j < _len1; _j++) {
     elem = explosions[_j];
     $('#map').drawLine({
-      strokeStyle: "#000",
+      strokeStyle: "#f90c22",
       strokeWidth: 2,
       x1: elem.x,
       y1: 0,
       x2: elem.x,
       y2: 500
     }).drawLine({
-      strokeStyle: "#000",
+      strokeStyle: "#f90c22",
       strokeWidth: 2,
       x1: 0,
       y1: elem.y,
