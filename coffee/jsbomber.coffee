@@ -107,6 +107,7 @@ explode_bomb = ->
 	bombs.splice(0,1)
 
 explosion = (x_pos, y_pos) ->
+	shake_map(5)
 	explosions.push({x: x_pos, y: y_pos})
 	setTimeout("extinguish_explosion()",1000)
 
@@ -131,6 +132,17 @@ player_collision = (player, explosion) ->
 		return true
 	else
 		return false
+
+# shake the map left and right by offset during an explosion
+shake_map = (offset) ->
+	$('#map').animate
+		left: '+=' + offset
+		, 100, ->
+			$('#map').animate
+				left: '-=' + offset
+				, 100, ->
+					# callback
+
 $ ->
 	game_logic()
 
