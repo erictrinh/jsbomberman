@@ -3,9 +3,39 @@ players = new Array()
 bombs = new Array()
 explosions = new Array()
 timer = null
+game_started = false
+
+intro_screen = ->
+	$('#map').drawText
+		fillStyle: '#000'
+		x: 250
+		y: 100
+		text: 'JSBomber'
+		font: '60pt Helvetica, sans-serif'
+	.drawText
+		fillStyle: '#000'
+		x: 250
+		y: 300
+		text: "Press 'spacebar' to continue"
+		font: '25pt Helvetica, sans-serif'
+
+game_over_screen = (text) ->
+	$('#map').drawText
+		fillStyle: '#000'
+		x: 250
+		y: 100
+		text: text
+		font: '50pt Helvetica, sans-serif'
+	.drawText
+		fillStyle: '#000'
+		x: 250
+		y: 300
+		text: "Play again? (Spacebar)"
+		font: '25pt Helvetica, sans-serif'
 
 # initialize the game with 2 players
 init_game = ->
+	game_started = true
 	players[0] = 
 		position:
 			x: 25
@@ -66,7 +96,9 @@ game_logic = ->
 
 	update_map()
 	if check_collisions()
+		# game over
 		clearTimeout(timer)
+		game_started = false
 	else
 		timer=setTimeout("game_logic()",25)
 
@@ -140,13 +172,13 @@ check_collisions = ->
 			if player_collision(player, explosion)
 				player.dead = true
 	if players[0].dead && players[1].dead
-		console.log('both players dead')
+		game_over_screen('double suicide')
 		return true
 	else if players[0].dead
-		console.log('player 1 dead')
+		game_over_screen('player 1 dead')
 		return true
 	else if players[1].dead
-		console.log('player 2 dead')
+		game_over_screen('player 2 dead')
 		return true
 	else
 		return false
@@ -172,11 +204,14 @@ shake_map = (offset) ->
 					# callback
 
 $ ->
-	init_game()
-	game_logic()
+	intro_screen()
 
 $(document).bind 'keydown', (e) ->
 	unless event.metaKey
+		unless game_started
+			if e.which is 32 # this is the spacebar
+				init_game()
+				game_logic()
 		for player, player_id in players
 			if e.which is player.controls.up
 				player.up = true
