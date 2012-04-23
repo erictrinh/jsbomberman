@@ -13,5 +13,3 @@ Player 2 controls:
 
 	movement: PL;' (semicolon and single quote)
 	drop a bomb: / (forward slash)
-	
-If one or both players die, the game currently prints out who died in the console and stops the game.
