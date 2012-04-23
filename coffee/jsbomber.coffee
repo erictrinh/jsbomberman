@@ -204,15 +204,15 @@ update_map = ->
 			strokeStyle: "#f90c22"
 			strokeWidth: 2
 			x1: elem.x
-			y1: elem.y - elem.r*50
+			y1: elem.y - elem.r*50 + 25
 			x2: elem.x
-			y2: elem.y + elem.r*50
+			y2: elem.y + elem.r*50 + 25
 		.drawLine
 			strokeStyle: "#f90c22"
 			strokeWidth: 2
-			x1: elem.x - elem.r*50
+			x1: elem.x - elem.r*50 + 25
 			y1: elem.y
-			x2: elem.x + elem.r*50
+			x2: elem.x + elem.r*50 + 25
 			y2: elem.y
 	for player in players
 		$('#map').drawRect
@@ -284,7 +284,7 @@ check_collisions = ->
 	else
 		return false
 player_collision = (player, explosion) ->
-	if (player.position.x-25/2 < explosion.x < player.position.x+25/2 && Math.abs(player.position.y-explosion.y) < explosion.r*50) || (player.position.y-25/2 < explosion.y < player.position.y+25/2 && Math.abs(player.position.x-explosion.x) < explosion.r*50)
+	if (player.position.x-25/2 < explosion.x < player.position.x+25/2 && Math.abs(player.position.y-explosion.y) < explosion.r*50+25) || (player.position.y-25/2 < explosion.y < player.position.y+25/2 && Math.abs(player.position.x-explosion.x) < explosion.r*50+25)
 		return true
 	else
 		return false

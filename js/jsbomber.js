@@ -236,15 +236,15 @@ update_map = function() {
       strokeStyle: "#f90c22",
       strokeWidth: 2,
       x1: elem.x,
-      y1: elem.y - elem.r * 50,
+      y1: elem.y - elem.r * 50 + 25,
       x2: elem.x,
-      y2: elem.y + elem.r * 50
+      y2: elem.y + elem.r * 50 + 25
     }).drawLine({
       strokeStyle: "#f90c22",
       strokeWidth: 2,
-      x1: elem.x - elem.r * 50,
+      x1: elem.x - elem.r * 50 + 25,
       y1: elem.y,
-      x2: elem.x + elem.r * 50,
+      x2: elem.x + elem.r * 50 + 25,
       y2: elem.y
     });
   }
@@ -350,7 +350,7 @@ check_collisions = function() {
 
 player_collision = function(player, explosion) {
   var _ref, _ref1;
-  if (((player.position.x - 25 / 2 < (_ref = explosion.x) && _ref < player.position.x + 25 / 2) && Math.abs(player.position.y - explosion.y) < explosion.r * 50) || ((player.position.y - 25 / 2 < (_ref1 = explosion.y) && _ref1 < player.position.y + 25 / 2) && Math.abs(player.position.x - explosion.x) < explosion.r * 50)) {
+  if (((player.position.x - 25 / 2 < (_ref = explosion.x) && _ref < player.position.x + 25 / 2) && Math.abs(player.position.y - explosion.y) < explosion.r * 50 + 25) || ((player.position.y - 25 / 2 < (_ref1 = explosion.y) && _ref1 < player.position.y + 25 / 2) && Math.abs(player.position.x - explosion.x) < explosion.r * 50 + 25)) {
     return true;
   } else {
     return false;
