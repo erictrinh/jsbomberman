@@ -16,7 +16,7 @@ intro_screen = ->
 		fillStyle: '#000'
 		x: 250
 		y: 300
-		text: "Press 'spacebar' to continue"
+		text: "Press 'spacebar' to start"
 		font: '25pt Helvetica, sans-serif'
 
 game_over_screen = (text) ->
