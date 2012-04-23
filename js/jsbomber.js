@@ -98,7 +98,7 @@ on_snap_x = function(player) {
   x = player.position.x;
   x_distance = (x - 25) % 50;
   if (x_distance > 0) {
-    if (x - x_distance < 25) {
+    if (x_distance < 25) {
       return x - x_distance;
     } else {
       return x + (50 - x_distance);
@@ -113,7 +113,7 @@ on_snap_y = function(player) {
   y = player.position.y;
   y_distance = (y - 25) % 50;
   if (y_distance > 0) {
-    if (y - y_distance < 25) {
+    if (y_distance < 25) {
       return y - y_distance;
     } else {
       return y + (50 - y_distance);
