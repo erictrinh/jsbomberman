@@ -77,57 +77,83 @@ init_game = ->
 		left: false
 		dead: false
 
-# check if the player is on a snap coordinate
-# if not, give the destination snap coordinates
+# give the destination snap coordinates
+# returns player coordinates if on a snap coordinate
 on_snap_x = (player) ->
 	x = player.position.x
 	# distance past a snap coordinate
 	x_distance = (x-25)%50
 	
 	if x_distance > 0
-		if player.facing is 'left'
+		if x-x_distance < 25
 			return x-x_distance
-		else if player.facing is 'right'
+		else
 			return x+(50-x_distance)
 	else
-		return 0
+		return x
 on_snap_y = (player) ->
 	y = player.position.y
 	# distance past a snap coordinate
 	y_distance = (y-25)%50
 	
 	if y_distance > 0
-		if player.facing is 'up'
+		if y-y_distance < 25
 			return y-y_distance
-		else if player.facing is 'down'
+		else
 			return y+(50-y_distance)
 	else
-		return 0
+		return y
 
 game_logic = ->
 	for player in players
-		# snap to coordinates 25+50, unless already on a snap coordinate
-		if on_snap_y(player)>0
-			if player.facing is 'up'
-				player.position.y -= player.speed
-			else if player.facing is 'down'
-				player.position.y += player.speed
-		if on_snap_x(player)>0
-			if player.facing is 'left'
-				player.position.x -= player.speed
-			else if player.facing is 'right'
-				player.position.x += player.speed
+		# player is holding down the up key
 		if player.up
-			player.position.y -= player.speed
-		# keyplayers[0].down is s
+			# not on a snap axis
+			if on_snap_x(player) isnt player.position.x
+				# move towards the snap coordinate
+				if on_snap_x(player) > player.position.x
+					player.position.x += player.speed
+				else
+					player.position.x -= player.speed
+			# this is on a snap axis, so move normally
+			else
+				player.position.y -= player.speed
+		# player is holding down the down key
 		else if player.down
-			player.position.y += player.speed
-		# keyplayers[0].down is a
+			# not on a snap axis
+			if on_snap_x(player) isnt player.position.x
+				# move towards the snap coordinate
+				if on_snap_x(player) > player.position.x
+					player.position.x += player.speed
+				else
+					player.position.x -= player.speed
+			# this is on a snap axis, so move normally
+			else
+				player.position.y += player.speed
+		# player is holding down the left key
 		else if player.left
-			player.position.x -= player.speed
-		# keyplayers[0].down is d
+			# not on a snap axis
+			if on_snap_y(player) isnt player.position.y
+				# move towards the snap coordinate
+				if on_snap_y(player) > player.position.y
+					player.position.y += player.speed
+				else
+					player.position.y -= player.speed
+			# this is on a snap axis, so move normally
+			else
+				player.position.x -= player.speed
+		# player is holding down the right key
 		else if player.right
-			player.position.x += player.speed
+			# not on a snap axis
+			if on_snap_y(player) isnt player.position.y
+				# move towards the snap coordinate
+				if on_snap_y(player) > player.position.y
+					player.position.y += player.speed
+				else
+					player.position.y -= player.speed
+			# this is on a snap axis, so move normally
+			else
+				player.position.x += player.speed
 		# make sure players stay inside map
 		if player.position.y < 25/2
 			player.position.y = 25/2
@@ -289,28 +315,20 @@ $(document).bind 'keydown', (e) ->
 				game_logic()
 		for player, player_id in players
 			if e.which is player.controls.up
-				if player.facing isnt 'up' && player.facing isnt 'down' && on_snap_x(player)>0
-					player.position.x = on_snap_x(player)
 				player.up = true
 				player.facing = 'up'
 			else if e.which is player.controls.down
-				if player.facing isnt 'up' && player.facing isnt 'down' && on_snap_x(player)>0
-					player.position.x = on_snap_x(player)
 				player.down = true
 				player.facing = 'down'
 			else if e.which is player.controls.left
-				if player.facing isnt 'left' && player.facing isnt 'right' && on_snap_y(player)>0
-					player.position.y = on_snap_y(player)
 				player.left = true
 				player.facing = 'left'
 			else if e.which is player.controls.right
-				if player.facing isnt 'left' && player.facing isnt 'right' && on_snap_y(player)>0
-					player.position.y = on_snap_y(player)
 				player.right = true
 				player.facing = 'right'
 			else if e.which is player.controls.drop
 				if player.num_bombs>0
-					drop_bomb(player.position.x, player.position.y, player_id, player.bomb_range)
+					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range)
 					player.num_bombs -= 1
 		return false
 .bind 'keyup', (e) ->

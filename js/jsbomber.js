@@ -98,13 +98,13 @@ on_snap_x = function(player) {
   x = player.position.x;
   x_distance = (x - 25) % 50;
   if (x_distance > 0) {
-    if (player.facing === 'left') {
+    if (x - x_distance < 25) {
       return x - x_distance;
-    } else if (player.facing === 'right') {
+    } else {
       return x + (50 - x_distance);
     }
   } else {
-    return 0;
+    return x;
   }
 };
 
@@ -113,13 +113,13 @@ on_snap_y = function(player) {
   y = player.position.y;
   y_distance = (y - 25) % 50;
   if (y_distance > 0) {
-    if (player.facing === 'up') {
+    if (y - y_distance < 25) {
       return y - y_distance;
-    } else if (player.facing === 'down') {
+    } else {
       return y + (50 - y_distance);
     }
   } else {
-    return 0;
+    return y;
   }
 };
 
@@ -127,28 +127,46 @@ game_logic = function() {
   var player, _i, _len;
   for (_i = 0, _len = players.length; _i < _len; _i++) {
     player = players[_i];
-    if (on_snap_y(player) > 0) {
-      if (player.facing === 'up') {
+    if (player.up) {
+      if (on_snap_x(player) !== player.position.x) {
+        if (on_snap_x(player) > player.position.x) {
+          player.position.x += player.speed;
+        } else {
+          player.position.x -= player.speed;
+        }
+      } else {
         player.position.y -= player.speed;
-      } else if (player.facing === 'down') {
+      }
+    } else if (player.down) {
+      if (on_snap_x(player) !== player.position.x) {
+        if (on_snap_x(player) > player.position.x) {
+          player.position.x += player.speed;
+        } else {
+          player.position.x -= player.speed;
+        }
+      } else {
         player.position.y += player.speed;
       }
-    }
-    if (on_snap_x(player) > 0) {
-      if (player.facing === 'left') {
+    } else if (player.left) {
+      if (on_snap_y(player) !== player.position.y) {
+        if (on_snap_y(player) > player.position.y) {
+          player.position.y += player.speed;
+        } else {
+          player.position.y -= player.speed;
+        }
+      } else {
         player.position.x -= player.speed;
-      } else if (player.facing === 'right') {
+      }
+    } else if (player.right) {
+      if (on_snap_y(player) !== player.position.y) {
+        if (on_snap_y(player) > player.position.y) {
+          player.position.y += player.speed;
+        } else {
+          player.position.y -= player.speed;
+        }
+      } else {
         player.position.x += player.speed;
       }
-    }
-    if (player.up) {
-      player.position.y -= player.speed;
-    } else if (player.down) {
-      player.position.y += player.speed;
-    } else if (player.left) {
-      player.position.x -= player.speed;
-    } else if (player.right) {
-      player.position.x += player.speed;
     }
     if (player.position.y < 25 / 2) {
       player.position.y = 25 / 2;
@@ -374,32 +392,20 @@ $(document).bind('keydown', function(e) {
     for (player_id = _i = 0, _len = players.length; _i < _len; player_id = ++_i) {
       player = players[player_id];
       if (e.which === player.controls.up) {
-        if (player.facing !== 'up' && player.facing !== 'down' && on_snap_x(player) > 0) {
-          player.position.x = on_snap_x(player);
-        }
         player.up = true;
         player.facing = 'up';
       } else if (e.which === player.controls.down) {
-        if (player.facing !== 'up' && player.facing !== 'down' && on_snap_x(player) > 0) {
-          player.position.x = on_snap_x(player);
-        }
         player.down = true;
         player.facing = 'down';
       } else if (e.which === player.controls.left) {
-        if (player.facing !== 'left' && player.facing !== 'right' && on_snap_y(player) > 0) {
-          player.position.y = on_snap_y(player);
-        }
         player.left = true;
         player.facing = 'left';
       } else if (e.which === player.controls.right) {
-        if (player.facing !== 'left' && player.facing !== 'right' && on_snap_y(player) > 0) {
-          player.position.y = on_snap_y(player);
-        }
         player.right = true;
         player.facing = 'right';
       } else if (e.which === player.controls.drop) {
         if (player.num_bombs > 0) {
-          drop_bomb(player.position.x, player.position.y, player_id, player.bomb_range);
+          drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range);
           player.num_bombs -= 1;
         }
       }
