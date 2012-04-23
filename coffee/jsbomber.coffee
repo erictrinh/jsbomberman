@@ -42,6 +42,7 @@ init_game = ->
 			y: 25
 		speed: 5
 		num_bombs: 3
+		bomb_range: 1
 		controls:
 			up: 87
 			down: 83
@@ -59,6 +60,7 @@ init_game = ->
 			y: 475
 		speed: 5
 		num_bombs: 3
+		bomb_range: 1
 		controls:
 			up: 80
 			down: 186
@@ -117,15 +119,15 @@ update_map = ->
 			strokeStyle: "#f90c22"
 			strokeWidth: 2
 			x1: elem.x
-			y1: 0
+			y1: elem.y - elem.r*50
 			x2: elem.x
-			y2: 500
+			y2: elem.y + elem.r*50
 		.drawLine
 			strokeStyle: "#f90c22"
 			strokeWidth: 2
-			x1: 0
+			x1: elem.x - elem.r*50
 			y1: elem.y
-			x2: 500
+			x2: elem.x + elem.r*50
 			y2: elem.y
 	for player in players
 		$('#map').drawRect
@@ -138,29 +140,23 @@ update_map = ->
 			strokeStyle: '#000'
 			strokeWidth: 1
 
-drop_bomb = (x_pos, y_pos, pid) ->
-	bombs.push({x: x_pos, y: y_pos, player_id: pid, timer: setTimeout("explode_bomb()",3000)})
+drop_bomb = (x_pos, y_pos, pid, brange) ->
+	bombs.push({x: x_pos, y: y_pos, player_id: pid, range: brange, timer: setTimeout("explode_bomb()",3000)})
 
 explode_bomb = (index=0) ->
 	clearTimeout(bombs[index].timer)
 	# replenish bomb supply
 	pid = bombs[index].player_id
 	players[pid].num_bombs += 1
-	explosion(bombs[index].x, bombs[index].y)
+	explosion(bombs[index].x, bombs[index].y, bombs[index].range)
 	bombs.splice(index,1)
 
-explosion = (x_pos, y_pos) ->
-	shake_map(5)
+explosion = (x_pos, y_pos, range) ->
+	shake_map(range)
 	
-	explosions.push({x: x_pos, y: y_pos})
+	explosions.push({x: x_pos, y: y_pos, r: range})
 	
 	setTimeout("extinguish_explosion()",1000)
-
-chain_explosions = ->
-	for index in explosions2b
-		explode_bomb(index)
-	# clear the explosions2b array
-	explosions2b = []
 
 extinguish_explosion = ->
 	explosions.splice(0,1)
@@ -183,7 +179,7 @@ check_collisions = ->
 	else
 		return false
 player_collision = (player, explosion) ->
-	if player.position.x-25/2 < explosion.x < player.position.x+25/2 || player.position.y-25/2 < explosion.y < player.position.y+25/2
+	if (player.position.x-25/2 < explosion.x < player.position.x+25/2 && Math.abs(player.position.y-explosion.y) < explosion.r*50) || (player.position.y-25/2 < explosion.y < player.position.y+25/2 && Math.abs(player.position.x-explosion.x) < explosion.r*50)
 		return true
 	else
 		return false
@@ -223,7 +219,7 @@ $(document).bind 'keydown', (e) ->
 				player.right = true
 			else if e.which is player.controls.drop
 				if player.num_bombs>0
-					drop_bomb(player.position.x, player.position.y, player_id)
+					drop_bomb(player.position.x, player.position.y, player_id, player.bomb_range)
 					player.num_bombs -= 1
 		return false
 .bind 'keyup', (e) ->
