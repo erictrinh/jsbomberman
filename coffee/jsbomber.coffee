@@ -108,6 +108,23 @@ game_logic = ->
 
 update_map = ->
 	$('#map').clearCanvas()
+	template = [1..9]
+	overlay = (num*50 for num in template)
+	for num in overlay
+		$('#map').drawLine
+			strokeStyle: "#cfcfcf"
+			strokeWidth: 1
+			x1: num
+			y1: 0
+			x2: num
+			y2: 500
+		.drawLine
+			strokeStyle: "#cfcfcf"
+			strokeWidth: 1
+			x1: 0
+			y1: num
+			x2: 500
+			y2: num
 	for elem in bombs
 		$('#map').drawRect
 			fillStyle: '#0c9df9'

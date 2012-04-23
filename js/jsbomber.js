@@ -125,10 +125,38 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var arc_end, arc_start, elem, player, _i, _j, _k, _len, _len1, _len2, _results;
+  var arc_end, arc_start, elem, num, overlay, player, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
   $('#map').clearCanvas();
-  for (_i = 0, _len = bombs.length; _i < _len; _i++) {
-    elem = bombs[_i];
+  template = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  overlay = (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = template.length; _i < _len; _i++) {
+      num = template[_i];
+      _results.push(num * 50);
+    }
+    return _results;
+  })();
+  for (_i = 0, _len = overlay.length; _i < _len; _i++) {
+    num = overlay[_i];
+    $('#map').drawLine({
+      strokeStyle: "#cfcfcf",
+      strokeWidth: 1,
+      x1: num,
+      y1: 0,
+      x2: num,
+      y2: 500
+    }).drawLine({
+      strokeStyle: "#cfcfcf",
+      strokeWidth: 1,
+      x1: 0,
+      y1: num,
+      x2: 500,
+      y2: num
+    });
+  }
+  for (_j = 0, _len1 = bombs.length; _j < _len1; _j++) {
+    elem = bombs[_j];
     $('#map').drawRect({
       fillStyle: '#0c9df9',
       x: elem.x,
@@ -138,8 +166,8 @@ update_map = function() {
       fromCenter: true
     });
   }
-  for (_j = 0, _len1 = explosions.length; _j < _len1; _j++) {
-    elem = explosions[_j];
+  for (_k = 0, _len2 = explosions.length; _k < _len2; _k++) {
+    elem = explosions[_k];
     $('#map').drawLine({
       strokeStyle: "#f90c22",
       strokeWidth: 2,
@@ -157,8 +185,8 @@ update_map = function() {
     });
   }
   _results = [];
-  for (_k = 0, _len2 = players.length; _k < _len2; _k++) {
-    player = players[_k];
+  for (_l = 0, _len3 = players.length; _l < _len3; _l++) {
+    player = players[_l];
     $('#map').drawRect({
       fillStyle: '#fff',
       x: player.position.x,
