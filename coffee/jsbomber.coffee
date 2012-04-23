@@ -36,6 +36,8 @@ game_over_screen = (text) ->
 # initialize the game with 2 players
 init_game = ->
 	game_started = true
+	bombs = []
+	explosions = []
 	players[0] = 
 		position:
 			x: 25
@@ -75,8 +77,46 @@ init_game = ->
 		left: false
 		dead: false
 
+# check if the player is on a snap coordinate
+# if not, give the destination snap coordinates
+on_snap_x = (player) ->
+	x = player.position.x
+	# distance past a snap coordinate
+	x_distance = (x-25)%50
+	
+	if x_distance > 0
+		if player.facing is 'left'
+			return x-x_distance
+		else if player.facing is 'right'
+			return x+(50-x_distance)
+	else
+		return 0
+on_snap_y = (player) ->
+	y = player.position.y
+	# distance past a snap coordinate
+	y_distance = (y-25)%50
+	
+	if y_distance > 0
+		if player.facing is 'up'
+			return y-y_distance
+		else if player.facing is 'down'
+			return y+(50-y_distance)
+	else
+		return 0
+
 game_logic = ->
 	for player in players
+		# snap to coordinates 25+50, unless already on a snap coordinate
+		if on_snap_y(player)>0
+			if player.facing is 'up'
+				player.position.y -= player.speed
+			else if player.facing is 'down'
+				player.position.y += player.speed
+		if on_snap_x(player)>0
+			if player.facing is 'left'
+				player.position.x -= player.speed
+			else if player.facing is 'right'
+				player.position.x += player.speed
 		if player.up
 			player.position.y -= player.speed
 		# keyplayers[0].down is s
@@ -88,7 +128,7 @@ game_logic = ->
 		# keyplayers[0].down is d
 		else if player.right
 			player.position.x += player.speed
-		
+		# make sure players stay inside map
 		if player.position.y < 25/2
 			player.position.y = 25/2
 		else if player.position.y > 475+25/2
@@ -249,15 +289,23 @@ $(document).bind 'keydown', (e) ->
 				game_logic()
 		for player, player_id in players
 			if e.which is player.controls.up
+				if player.facing isnt 'up' && player.facing isnt 'down' && on_snap_x(player)>0
+					player.position.x = on_snap_x(player)
 				player.up = true
 				player.facing = 'up'
 			else if e.which is player.controls.down
+				if player.facing isnt 'up' && player.facing isnt 'down' && on_snap_x(player)>0
+					player.position.x = on_snap_x(player)
 				player.down = true
 				player.facing = 'down'
 			else if e.which is player.controls.left
+				if player.facing isnt 'left' && player.facing isnt 'right' && on_snap_y(player)>0
+					player.position.y = on_snap_y(player)
 				player.left = true
 				player.facing = 'left'
 			else if e.which is player.controls.right
+				if player.facing isnt 'left' && player.facing isnt 'right' && on_snap_y(player)>0
+					player.position.y = on_snap_y(player)
 				player.right = true
 				player.facing = 'right'
 			else if e.which is player.controls.drop
