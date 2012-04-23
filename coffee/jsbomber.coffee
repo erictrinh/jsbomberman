@@ -155,14 +155,14 @@ game_logic = ->
 			else
 				player.position.x += player.speed
 		# make sure players stay inside map
-		if player.position.y < 25/2
-			player.position.y = 25/2
-		else if player.position.y > 475+25/2
-			player.position.y = 475+25/2
-		if player.position.x < 25/2
-			player.position.x = 25/2
-		else if player.position.x > 475+25/2
-			player.position.x = 475+25/2
+		if player.position.y < 25
+			player.position.y = 25
+		else if player.position.y > 475
+			player.position.y = 475
+		if player.position.x < 25
+			player.position.x = 25
+		else if player.position.x > 475
+			player.position.x = 475
 
 	update_map()
 	if check_collisions()
