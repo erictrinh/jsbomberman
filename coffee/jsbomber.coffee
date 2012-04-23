@@ -2,6 +2,7 @@
 players = new Array()
 bombs = new Array()
 explosions = new Array()
+objects = new Array()
 timer = null
 game_started = false
 
@@ -60,8 +61,8 @@ init_game = ->
 	players[1] = 
 		facing: 'up'
 		position:
-			x: 475
-			y: 475
+			x: 725
+			y: 425
 		speed: 5
 		num_bombs: 3
 		bomb_range: 3
@@ -157,12 +158,12 @@ game_logic = ->
 		# make sure players stay inside map
 		if player.position.y < 25
 			player.position.y = 25
-		else if player.position.y > 475
-			player.position.y = 475
+		else if player.position.y > 425
+			player.position.y = 425
 		if player.position.x < 25
 			player.position.x = 25
-		else if player.position.x > 475
-			player.position.x = 475
+		else if player.position.x > 725
+			player.position.x = 725
 
 	update_map()
 	if check_collisions()
@@ -174,7 +175,7 @@ game_logic = ->
 
 update_map = ->
 	$('#map').clearCanvas()
-	template = [1..9]
+	template = [1..14]
 	overlay = (num*50 for num in template)
 	for num in overlay
 		$('#map').drawLine
@@ -183,14 +184,15 @@ update_map = ->
 			x1: num
 			y1: 0
 			x2: num
-			y2: 500
-		.drawLine
-			strokeStyle: "#cfcfcf"
-			strokeWidth: 1
-			x1: 0
-			y1: num
-			x2: 500
-			y2: num
+			y2: 450
+		if num <= 425
+			$('#map').drawLine
+				strokeStyle: "#cfcfcf"
+				strokeWidth: 1
+				x1: 0
+				y1: num
+				x2: 750
+				y2: num
 	for elem in bombs
 		$('#map').drawRect
 			fillStyle: '#0c9df9'
