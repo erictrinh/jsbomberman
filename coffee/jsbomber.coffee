@@ -40,9 +40,10 @@ init_game = ->
 		position:
 			x: 25
 			y: 25
+		facing: 'down'
 		speed: 5
 		num_bombs: 3
-		bomb_range: 1
+		bomb_range: 3
 		controls:
 			up: 87
 			down: 83
@@ -55,12 +56,13 @@ init_game = ->
 		left: false
 		dead: false
 	players[1] = 
+		facing: 'up'
 		position:
 			x: 475
 			y: 475
 		speed: 5
 		num_bombs: 3
-		bomb_range: 1
+		bomb_range: 3
 		controls:
 			up: 80
 			down: 186
@@ -131,7 +133,7 @@ update_map = ->
 			y2: elem.y
 	for player in players
 		$('#map').drawRect
-			fillStyle: '#3d454b'
+			fillStyle: '#fff'
 			x: player.position.x
 			y: player.position.y
 			width: 25
@@ -139,6 +141,26 @@ update_map = ->
 			fromCenter: true
 			strokeStyle: '#000'
 			strokeWidth: 1
+		if player.facing is 'right'
+			arc_start = 45
+			arc_end = 135
+		else if player.facing is 'down'
+			arc_start = 135
+			arc_end = 225
+		else if player.facing is 'left'
+			arc_start = 225
+			arc_end = 315
+		else if player.facing is 'up'
+			arc_start = 315
+			arc_end = 45
+		$('#map').drawArc
+		  strokeStyle: "#000"
+		  strokeWidth: 1
+		  x: player.position.x
+		  y: player.position.y
+		  radius: 18
+		  start: arc_start
+		  end: arc_end
 
 drop_bomb = (x_pos, y_pos, pid, brange) ->
 	bombs.push({x: x_pos, y: y_pos, player_id: pid, range: brange, timer: setTimeout("explode_bomb()",3000)})
@@ -211,12 +233,16 @@ $(document).bind 'keydown', (e) ->
 		for player, player_id in players
 			if e.which is player.controls.up
 				player.up = true
+				player.facing = 'up'
 			else if e.which is player.controls.down
 				player.down = true
+				player.facing = 'down'
 			else if e.which is player.controls.left
 				player.left = true
+				player.facing = 'left'
 			else if e.which is player.controls.right
 				player.right = true
+				player.facing = 'right'
 			else if e.which is player.controls.drop
 				if player.num_bombs>0
 					drop_bomb(player.position.x, player.position.y, player_id, player.bomb_range)

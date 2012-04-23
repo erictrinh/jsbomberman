@@ -50,9 +50,10 @@ init_game = function() {
       x: 25,
       y: 25
     },
+    facing: 'down',
     speed: 5,
     num_bombs: 3,
-    bomb_range: 1,
+    bomb_range: 3,
     controls: {
       up: 87,
       down: 83,
@@ -67,13 +68,14 @@ init_game = function() {
     dead: false
   };
   return players[1] = {
+    facing: 'up',
     position: {
       x: 475,
       y: 475
     },
     speed: 5,
     num_bombs: 3,
-    bomb_range: 1,
+    bomb_range: 3,
     controls: {
       up: 80,
       down: 186,
@@ -123,7 +125,7 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var elem, player, _i, _j, _k, _len, _len1, _len2, _results;
+  var arc_end, arc_start, elem, player, _i, _j, _k, _len, _len1, _len2, _results;
   $('#map').clearCanvas();
   for (_i = 0, _len = bombs.length; _i < _len; _i++) {
     elem = bombs[_i];
@@ -157,8 +159,8 @@ update_map = function() {
   _results = [];
   for (_k = 0, _len2 = players.length; _k < _len2; _k++) {
     player = players[_k];
-    _results.push($('#map').drawRect({
-      fillStyle: '#3d454b',
+    $('#map').drawRect({
+      fillStyle: '#fff',
       x: player.position.x,
       y: player.position.y,
       width: 25,
@@ -166,6 +168,28 @@ update_map = function() {
       fromCenter: true,
       strokeStyle: '#000',
       strokeWidth: 1
+    });
+    if (player.facing === 'right') {
+      arc_start = 45;
+      arc_end = 135;
+    } else if (player.facing === 'down') {
+      arc_start = 135;
+      arc_end = 225;
+    } else if (player.facing === 'left') {
+      arc_start = 225;
+      arc_end = 315;
+    } else if (player.facing === 'up') {
+      arc_start = 315;
+      arc_end = 45;
+    }
+    _results.push($('#map').drawArc({
+      strokeStyle: "#000",
+      strokeWidth: 1,
+      x: player.position.x,
+      y: player.position.y,
+      radius: 18,
+      start: arc_start,
+      end: arc_end
     }));
   }
   return _results;
@@ -277,12 +301,16 @@ $(document).bind('keydown', function(e) {
       player = players[player_id];
       if (e.which === player.controls.up) {
         player.up = true;
+        player.facing = 'up';
       } else if (e.which === player.controls.down) {
         player.down = true;
+        player.facing = 'down';
       } else if (e.which === player.controls.left) {
         player.left = true;
+        player.facing = 'left';
       } else if (e.which === player.controls.right) {
         player.right = true;
+        player.facing = 'right';
       } else if (e.which === player.controls.drop) {
         if (player.num_bombs > 0) {
           drop_bomb(player.position.x, player.position.y, player_id, player.bomb_range);
