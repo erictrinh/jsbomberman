@@ -137,8 +137,10 @@ init_game = function() {
     },
     facing: 'down',
     speed: 5,
-    num_bombs: 3,
-    bomb_range: 3,
+    bomb_supply: {
+      number: 1,
+      range: 1
+    },
     controls: {
       up: 87,
       down: 83,
@@ -159,8 +161,10 @@ init_game = function() {
       y: 425
     },
     speed: 5,
-    num_bombs: 3,
-    bomb_range: 3,
+    bomb_supply: {
+      number: 1,
+      range: 1
+    },
     controls: {
       up: 80,
       down: 186,
@@ -413,9 +417,9 @@ walkover_logic = function(player) {
   if (objects[coords.row][coords.col].type === 'upgrade') {
     kind = objects[coords.row][coords.col].kind;
     if (kind === 'bomb_up') {
-      player.num_bombs += 1;
+      player.bomb_supply.number += 1;
     } else if (kind === 'range_up') {
-      player.bomb_range += 1;
+      player.bomb_supply.range += 1;
     }
     return objects[coords.row][coords.col] = new Empty();
   }
@@ -565,7 +569,7 @@ explode = function(r, c) {
   bomb = objects[r][c];
   clearTimeout(bomb.timer);
   pid = bomb.player_id;
-  players[pid].num_bombs += 1;
+  players[pid].bomb_supply.number += 1;
   range = bomb.range;
   explosion_logic(r, c, range);
   offset = range;
@@ -737,9 +741,9 @@ $(document).bind('keydown', function(e) {
         player.right = true;
       } else if (e.which === player.controls.drop) {
         coords = get_grid_coords(player);
-        if (player.num_bombs > 0 && objects[coords.row][coords.col].type !== 'bomb') {
-          drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range);
-          player.num_bombs -= 1;
+        if (player.bomb_supply.number > 0 && objects[coords.row][coords.col].type !== 'bomb') {
+          drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_supply.range);
+          player.bomb_supply.number -= 1;
         }
       }
     }

@@ -119,8 +119,9 @@ init_game = ->
 			y: 25
 		facing: 'down'
 		speed: 5
-		num_bombs: 3
-		bomb_range: 3
+		bomb_supply:
+			number: 1
+			range: 1
 		controls:
 			up: 87
 			down: 83
@@ -138,8 +139,9 @@ init_game = ->
 			x: 725
 			y: 425
 		speed: 5
-		num_bombs: 3
-		bomb_range: 3
+		bomb_supply:
+			number: 1
+			range: 1
 		controls:
 			up: 80
 			down: 186
@@ -362,9 +364,9 @@ walkover_logic = (player) ->
 	if objects[coords.row][coords.col].type is 'upgrade'
 		kind = objects[coords.row][coords.col].kind
 		if kind is 'bomb_up'
-			player.num_bombs+=1
+			player.bomb_supply.number+=1
 		else if kind is 'range_up'
-			player.bomb_range+=1
+			player.bomb_supply.range+=1
 		
 		# delete the upgrade once you've picked it up
 		objects[coords.row][coords.col] = new Empty()
@@ -486,7 +488,7 @@ explode = (r, c) ->
 	
 	# replenish bomb supply of the player whose bomb this is
 	pid = bomb.player_id
-	players[pid].num_bombs += 1
+	players[pid].bomb_supply.number += 1
 	
 	# get the range of the bomb
 	range = bomb.range
@@ -652,9 +654,9 @@ $(document).bind 'keydown', (e) ->
 				player.right = true
 			else if e.which is player.controls.drop
 				coords = get_grid_coords(player)
-				if player.num_bombs>0 && objects[coords.row][coords.col].type isnt 'bomb'
-					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range)
-					player.num_bombs -= 1
+				if player.bomb_supply.number>0 && objects[coords.row][coords.col].type isnt 'bomb'
+					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_supply.range)
+					player.bomb_supply.number -= 1
 		return false
 .bind 'keyup', (e) ->
 	unless event.metaKey
