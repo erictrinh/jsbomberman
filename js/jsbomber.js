@@ -102,6 +102,10 @@ Upgrade = function(k) {
 
 init_game = function() {
   var c_index, object, r_index, row, _i, _j, _len, _len1;
+  $('#stats').css('color', 'black');
+  $('#numbombs').text(1);
+  $('#rangebombs').text(1);
+  $('#awesomeness').html('&#8734;');
   game_started = true;
   explosions = [];
   objects = [[5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [5, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 5], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5]];
@@ -113,7 +117,7 @@ init_game = function() {
         objects[r_index][c_index] = new Empty();
       } else if (object === 0) {
         if (Math.random() < 0.7) {
-          if (Math.random() < 0.5) {
+          if (Math.random() < 0.3) {
             if (Math.random() < 0.5) {
               objects[r_index][c_index] = new Wood('range_up');
             } else {
@@ -138,6 +142,7 @@ init_game = function() {
     facing: 'down',
     speed: 5,
     bomb_supply: {
+      max_number: 1,
       number: 1,
       range: 1
     },
@@ -162,6 +167,7 @@ init_game = function() {
     },
     speed: 5,
     bomb_supply: {
+      max_number: 1,
       number: 1,
       range: 1
     },
@@ -416,10 +422,13 @@ walkover_logic = function(player) {
   coords = get_grid_coords(player);
   if (objects[coords.row][coords.col].type === 'upgrade') {
     kind = objects[coords.row][coords.col].kind;
-    if (kind === 'bomb_up' && player.bomb_supply.number <= 9) {
+    if (kind === 'bomb_up' && player.bomb_supply.max_number <= 9) {
+      player.bomb_supply.max_number += 1;
       player.bomb_supply.number += 1;
+      $('#numbombs').text(player.bomb_supply.max_number);
     } else if (kind === 'range_up' && player.bomb_supply.range <= 9) {
       player.bomb_supply.range += 1;
+      $('#rangebombs').text(player.bomb_supply.range);
     }
     return objects[coords.row][coords.col] = new Empty();
   }

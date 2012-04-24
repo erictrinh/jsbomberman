@@ -85,6 +85,10 @@ Upgrade = (k) ->
 
 # initialize the game with 2 players
 init_game = ->
+	$('#stats').css('color', 'black')
+	$('#numbombs').text(1)
+	$('#rangebombs').text(1)
+	$('#awesomeness').html('&#8734;')
 	game_started = true
 	explosions = []
 	# initialize objects as a 2d array and add stone blocks
@@ -99,8 +103,8 @@ init_game = ->
 			else if object is 0
 				# approx. 0.7 chance of there being a wooden block
 				if Math.random() < 0.7
-					# 0.5 chance of wooden block containing upgrade
-					if Math.random() < 0.5
+					# 0.3 chance of wooden block containing upgrade
+					if Math.random() < 0.3
 						# 0.5 chance of either bomb up or range up upgrade
 						if Math.random() < 0.5
 							objects[r_index][c_index] = new Wood('range_up')
@@ -120,6 +124,7 @@ init_game = ->
 		facing: 'down'
 		speed: 5
 		bomb_supply:
+			max_number: 1
 			number: 1
 			range: 1
 		controls:
@@ -140,6 +145,7 @@ init_game = ->
 			y: 425
 		speed: 5
 		bomb_supply:
+			max_number: 1
 			number: 1
 			range: 1
 		controls:
@@ -363,10 +369,13 @@ walkover_logic = (player) ->
 	# if it's an upgrade, modify the player in some way
 	if objects[coords.row][coords.col].type is 'upgrade'
 		kind = objects[coords.row][coords.col].kind
-		if kind is 'bomb_up' && player.bomb_supply.number <= 9 # max number of bombs
+		if kind is 'bomb_up' && player.bomb_supply.max_number <= 9 # max number of bombs
+			player.bomb_supply.max_number+=1
 			player.bomb_supply.number+=1
+			$('#numbombs').text(player.bomb_supply.max_number)
 		else if kind is 'range_up'&& player.bomb_supply.range <= 9 # max range
 			player.bomb_supply.range+=1
+			$('#rangebombs').text(player.bomb_supply.range)
 		
 		# delete the upgrade once you've picked it up
 		objects[coords.row][coords.col] = new Empty()
