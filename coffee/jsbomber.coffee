@@ -208,7 +208,7 @@ can_go = (player) ->
 	if coords.row is 8 && player.position.y isnt 425
 		d = true
 	else if player.position.y is 425 || coords.row is 8 || !objects[coords.row+1][coords.col].walkable
-		if coords.col<8 && !objects[coords.row+1][coords.col].walkable && get_cartesian(coords.row, coords.col).y-player.position.y>0
+		if coords.row<8 && !objects[coords.row+1][coords.col].walkable && get_cartesian(coords.row, coords.col).y-player.position.y>0
 			d = true
 		else
 			d = false

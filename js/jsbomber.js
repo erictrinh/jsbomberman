@@ -239,7 +239,7 @@ can_go = function(player) {
   if (coords.row === 8 && player.position.y !== 425) {
     d = true;
   } else if (player.position.y === 425 || coords.row === 8 || !objects[coords.row + 1][coords.col].walkable) {
-    if (coords.col < 8 && !objects[coords.row + 1][coords.col].walkable && get_cartesian(coords.row, coords.col).y - player.position.y > 0) {
+    if (coords.row < 8 && !objects[coords.row + 1][coords.col].walkable && get_cartesian(coords.row, coords.col).y - player.position.y > 0) {
       d = true;
     } else {
       d = false;
