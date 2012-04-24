@@ -16,14 +16,14 @@ intro_screen = function() {
     fillStyle: '#000',
     x: center,
     y: 100,
-    text: 'JSBomber',
-    font: '60pt Helvetica, sans-serif'
+    text: '{JSBomber}',
+    font: '60pt Neuton, serif'
   }).drawText({
     fillStyle: '#000',
     x: center,
     y: 300,
     text: "Press 'spacebar' to start",
-    font: '25pt Helvetica, sans-serif'
+    font: '25pt Neuton, serif'
   });
 };
 
@@ -35,13 +35,13 @@ game_over_screen = function(text) {
     x: center,
     y: 100,
     text: text,
-    font: '50pt Helvetica, sans-serif'
+    font: '50pt Neuton, serif'
   }).drawText({
     fillStyle: '#000',
     x: center,
     y: 300,
     text: "Play again? (Spacebar)",
-    font: '25pt Helvetica, sans-serif'
+    font: '25pt Neuton, serif'
   });
 };
 
