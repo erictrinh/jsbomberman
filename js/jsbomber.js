@@ -157,6 +157,7 @@ init_game = function() {
     down: false,
     right: false,
     left: false,
+    drop: false,
     dead: false
   };
   return players[1] = {
@@ -182,6 +183,7 @@ init_game = function() {
     down: false,
     right: false,
     left: false,
+    drop: false,
     dead: false
   };
 };
@@ -566,10 +568,7 @@ update_map = function() {
   return _results;
 };
 
-drop_bomb = function(x_pos, y_pos, pid, brange) {
-  var c, r;
-  c = (x_pos - 25) / 50;
-  r = (y_pos - 25) / 50;
+drop_bomb = function(r, c, pid, brange) {
   return objects[r][c] = new Bomb(brange, pid, setTimeout("explode(" + r + "," + c + ")", 2500));
 };
 
@@ -751,7 +750,7 @@ $(document).bind('keydown', function(e) {
       } else if (e.which === player.controls.drop) {
         coords = get_grid_coords(player);
         if (player.bomb_supply.number > 0 && objects[coords.row][coords.col].type !== 'bomb') {
-          drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_supply.range);
+          drop_bomb(coords.row, coords.col, player_id, player.bomb_supply.range);
           player.bomb_supply.number -= 1;
         }
       }

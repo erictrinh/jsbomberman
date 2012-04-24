@@ -137,6 +137,7 @@ init_game = ->
 		down: false
 		right: false
 		left: false
+		drop: false
 		dead: false
 	players[1] = 
 		facing: 'up'
@@ -158,6 +159,7 @@ init_game = ->
 		down: false
 		right: false
 		left: false
+		drop: false
 		dead: false
 
 # give the destination snap coordinates
@@ -349,7 +351,6 @@ movement_logic = (player) ->
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'right'
-
 game_logic = ->
 	for player in players
 		movement_logic(player)
@@ -483,10 +484,7 @@ update_map = ->
 		  start: arc_start
 		  end: arc_end
 
-drop_bomb = (x_pos, y_pos, pid, brange) ->
-	# get grid coordinates of bomb
-	c = (x_pos-25)/50
-	r = (y_pos-25)/50
+drop_bomb = (r, c, pid, brange) ->
 	objects[r][c] = new Bomb(brange, pid, setTimeout("explode("+r+","+c+")",2500))
 
 # explode bomb at the coordinates
@@ -664,7 +662,7 @@ $(document).bind 'keydown', (e) ->
 			else if e.which is player.controls.drop
 				coords = get_grid_coords(player)
 				if player.bomb_supply.number>0 && objects[coords.row][coords.col].type isnt 'bomb'
-					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_supply.range)
+					drop_bomb(coords.row, coords.col, player_id, player.bomb_supply.range)
 					player.bomb_supply.number -= 1
 		return false
 .bind 'keyup', (e) ->
