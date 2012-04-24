@@ -49,11 +49,12 @@ Stone = ->
 	this.type = 'stone'
 	this.destructible = false
 	this.walkable = false
-# this is a wood object
-Wood = ->
+# this is a wood object, contains upgrade?
+Wood = (upg=false) ->
 	this.type = 'wood'
 	this.destructible = true
 	this.walkable = false
+	this.upgrade = upg
 # this is a bomb, also stores range and the player_id (index of the player that dropped it) 
 Bomb = (r, pid, t) ->
 	this.type = 'bomb'
@@ -70,6 +71,12 @@ Explosion = ->
 	# explosions can overlap, so we'll have a counter to see how many explosions we have stacked
 	this.count = 1
 # this is an upgrade
+### 
+	kinds of upgrades
+	bomb up
+	range up
+	x-ray goggles?
+###
 Upgrade = (k) ->
 	this.type = 'upgrade'
 	this.destructible = false
@@ -92,7 +99,11 @@ init_game = ->
 			else if object is 0
 				# approx. 0.7 chance of there being a wooden block
 				if Math.random() < 0.7
-					objects[r_index][c_index] = new Wood()
+					# 0.5 chance of wooden block containing upgrade
+					if Math.random() < 0.5
+						objects[r_index][c_index] = new Wood(true)
+					else
+						objects[r_index][c_index] = new Wood()
 				else
 					objects[r_index][c_index] = new Empty()
 			else if object is 1
@@ -330,7 +341,7 @@ movement_logic = (player) ->
 game_logic = ->
 	for player in players
 		movement_logic(player)
-
+		walkover_logic(player)
 	update_map()
 	if check_collisions()
 		# game over
@@ -338,6 +349,21 @@ game_logic = ->
 		game_started = false
 	else
 		timer=setTimeout("game_logic()",25)
+
+# determines the logic of walked over items and terrain
+# mainly upgrade behavior
+walkover_logic = (player) ->
+	coords = get_grid_coords(player)
+	# if it's an upgrade, modify the player in some way
+	if objects[coords.row][coords.col].type is 'upgrade'
+		kind = objects[coords.row][coords.col].kind
+		if kind is 'bomb_up'
+			player.num_bombs+=1
+		else if kind is 'range-up'
+			player.bomb_range+=1
+		
+		# delete the upgrade once you've picked it up
+		objects[coords.row][coords.col] = new Empty()
 
 # draws the map
 update_map = ->
@@ -392,6 +418,14 @@ update_map = ->
 			else if sq_type is 'wood'
 				$('#map').drawRect
 					fillStyle: '#593f00'
+					x: c_index*50+25
+					y: r_index*50+25
+					width: 40
+					height: 40
+					fromCenter: true
+			else if sq_type is 'upgrade'
+				$('#map').drawRect
+					fillStyle: '#ffad0f'
 					x: c_index*50+25
 					y: r_index*50+25
 					width: 40
@@ -520,18 +554,30 @@ explosion_logic = (r, c, range) ->
 # explosions can stack
 # extinguish these explosions later
 set_explosion = (r, c) ->
-	if objects[r][c].type isnt 'explosion'
-		objects[r][c] = new Explosion()
-	else
+	# if there's already an explosion, stack another explosion on top of it
+	if objects[r][c].type is 'explosion'
 		objects[r][c].count += 1
-	setTimeout("extinguish("+r+","+c+")",1000)
+	else
+		# if this is a wood block containing an upgrade, set the block to the upgrade
+		# this happens after the explosion
+		if objects[r][c].type is 'wood' && objects[r][c].upgrade || objects[r][c].type is 'upgrade'
+			setTimeout("set_upgrade("+r+","+c+",'bomb_up')",1000)
+		objects[r][c] = new Explosion()
 		
+	
+	# extinguish those explosions later
+	setTimeout("extinguish("+r+","+c+")",1000)
+
 extinguish = (r, c) ->
 	if objects[r][c].type is 'explosion'
 		if objects[r][c].count is 1
 			objects[r][c] = new Empty()
 		else
 			objects[r][c].count -= 1
+
+# set an upgrade at the coordinates
+set_upgrade = (r, c, kind) ->
+	objects[r][c] = new Upgrade('bomb_up')
 
 # check if any of the explosions hit the players
 check_collisions = ->
