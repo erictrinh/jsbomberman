@@ -61,12 +61,13 @@ Wood = function() {
   return this.walkable = false;
 };
 
-Bomb = function(r, pid) {
+Bomb = function(r, pid, t) {
   this.type = 'bomb';
   this.destructible = true;
   this.walkable = false;
   this.range = r;
-  return this.player_id = pid;
+  this.player_id = pid;
+  return this.timer = t;
 };
 
 Explosion = function() {
@@ -340,7 +341,7 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var arc_end, arc_start, c_index, column, elem, grid_square, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _results;
+  var arc_end, arc_start, c_index, column, grid_square, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
   $('#map').clearCanvas();
   template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   overlay = (function() {
@@ -408,13 +409,9 @@ update_map = function() {
       }
     }
   }
-  for (_l = 0, _len3 = explosions.length; _l < _len3; _l++) {
-    elem = explosions[_l];
-    draw_explosion(elem);
-  }
   _results = [];
-  for (_m = 0, _len4 = players.length; _m < _len4; _m++) {
-    player = players[_m];
+  for (_l = 0, _len3 = players.length; _l < _len3; _l++) {
+    player = players[_l];
     $('#map').drawRect({
       fillStyle: '#fff',
       x: player.position.x,
@@ -452,7 +449,7 @@ update_map = function() {
 };
 
 drop_bomb = function(x_pos, y_pos, pid, brange) {
-  var c, r;
+  var c, r, t;
   bombs.push({
     x: x_pos,
     y: y_pos,
@@ -462,7 +459,12 @@ drop_bomb = function(x_pos, y_pos, pid, brange) {
   });
   c = (x_pos - 25) / 50;
   r = (y_pos - 25) / 50;
-  return objects[r][c] = new Bomb(brange, pid);
+  /*
+  	insert timer here, after removing the bombs array
+  */
+
+  t = 0;
+  return objects[r][c] = new Bomb(brange, pid, t);
 };
 
 explode_bomb = function(index) {
@@ -483,6 +485,11 @@ explode_bomb = function(index) {
 explosion = function(x_pos, y_pos, range) {
   shake_map(range);
   explosions.push({
+    x: x_pos,
+    y: y_pos,
+    r: range
+  });
+  draw_explosion({
     x: x_pos,
     y: y_pos,
     r: range

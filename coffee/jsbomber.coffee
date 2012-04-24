@@ -51,12 +51,13 @@ Wood = ->
 	this.destructible = true
 	this.walkable = false
 # this is a bomb, also stores range and the player_id (index of the player that dropped it) 
-Bomb = (r, pid) ->
+Bomb = (r, pid, t) ->
 	this.type = 'bomb'
 	this.destructible = true
 	this.walkable = false
 	this.range = r
 	this.player_id = pid
+	this.timer = t
 # this is an explosion
 Explosion = ->
 	this.type = 'explosion'
@@ -344,8 +345,6 @@ update_map = ->
 					width: 40
 					height: 40
 					fromCenter: true
-	for elem in explosions
-		draw_explosion(elem)
 	for player in players
 		$('#map').drawRect
 			fillStyle: '#fff'
@@ -382,7 +381,11 @@ drop_bomb = (x_pos, y_pos, pid, brange) ->
 	# get grid coordinates of bomb
 	c = (x_pos-25)/50
 	r = (y_pos-25)/50
-	objects[r][c] = new Bomb(brange, pid)
+	###
+	insert timer here, after removing the bombs array
+	###
+	t = 0
+	objects[r][c] = new Bomb(brange, pid, t)
 
 explode_bomb = (index=0) ->
 	clearTimeout(bombs[index].timer)
@@ -401,6 +404,7 @@ explode_bomb = (index=0) ->
 explosion = (x_pos, y_pos, range) ->
 	shake_map(range)
 	explosions.push({x: x_pos, y: y_pos, r: range})
+	draw_explosion({x: x_pos, y: y_pos, r: range})
 	setTimeout("extinguish_explosion()",1000)
 
 draw_explosion = (explosion) ->
