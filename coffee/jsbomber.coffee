@@ -67,6 +67,8 @@ Explosion = ->
 	this.type = 'explosion'
 	this.destructible = false
 	this.walkable = true
+	# explosions can overlap, so we'll have a counter to see how many explosions we have stacked
+	this.count = 1
 # this is an upgrade
 Upgrade = (k) ->
 	this.type = 'upgrade'
@@ -411,14 +413,14 @@ explode = (r, c) ->
 # also takes care of extinguishing the explosion later
 explosion_logic = (r, c, range) ->
 	# set the epicenter grid square to an explosion square
-	objects[r][c] = new Explosion()
+	set_explosion(r, c)
 	setTimeout("extinguish("+r+","+c+")",1000)
 	
 	# figure out if bomb can explode upward
 	countdown = range # range of the bomb
 	temp_r = r-1
-	while countdown > 0 && temp_r >= 0 && objects[temp_r][c].type is 'empty'
-		objects[temp_r][c] = new Explosion()
+	while countdown > 0 && temp_r >= 0 && objects[temp_r][c].walkable
+		set_explosion(temp_r, c)
 		setTimeout("extinguish("+temp_r+","+c+")",1000)
 		temp_r -= 1
 		countdown -= 1
@@ -428,8 +430,8 @@ explosion_logic = (r, c, range) ->
 	# figure out if bomb can explode downward
 	countdown = range # range of the bomb
 	temp_r = r+1
-	while countdown > 0 && temp_r <= 8 && objects[temp_r][c].type is 'empty'
-		objects[temp_r][c] = new Explosion()
+	while countdown > 0 && temp_r <= 8 && objects[temp_r][c].walkable
+		set_explosion(temp_r, c)
 		setTimeout("extinguish("+temp_r+","+c+")",1000)
 		temp_r += 1
 		countdown -= 1
@@ -439,8 +441,8 @@ explosion_logic = (r, c, range) ->
 	# figure out if bomb can explode leftward
 	countdown = range # range of the bomb
 	temp_c = c-1
-	while countdown > 0 && temp_c >= 0 && objects[r][temp_c].type is 'empty'
-		objects[r][temp_c] = new Explosion()
+	while countdown > 0 && temp_c >= 0 && objects[r][temp_c].walkable
+		set_explosion(r, temp_c)
 		setTimeout("extinguish("+r+","+temp_c+")",1000)
 		temp_c -= 1
 		countdown -= 1
@@ -450,17 +452,28 @@ explosion_logic = (r, c, range) ->
 	# figure out if bomb can explode rightward
 	countdown = range # range of the bomb
 	temp_c = c+1
-	while countdown > 0 && temp_c <= 14 && objects[r][temp_c].type is 'empty'
-		objects[r][temp_c] = new Explosion()
+	while countdown > 0 && temp_c <= 14 && objects[r][temp_c].walkable
+		set_explosion(r, temp_c)
 		setTimeout("extinguish("+r+","+temp_c+")",1000)
 		temp_c += 1
 		countdown -= 1
 	if countdown > 0 && temp_c <= 14 && objects[r][temp_c].type is 'bomb'
 		explode(r, temp_c)
 
+# set an explosion at the coordinates
+# explosions can stack
+set_explosion = (r, c) ->
+	if objects[r][c].type isnt 'explosion'
+		objects[r][c] = new Explosion()
+	else
+		objects[r][c].count += 1
+		
 extinguish = (r, c) ->
 	if objects[r][c].type is 'explosion'
-		objects[r][c] = new Empty()
+		if objects[r][c].count is 1
+			objects[r][c] = new Empty()
+		else
+			objects[r][c].count -= 1
 
 # check if any of the explosions hit the players
 check_collisions = ->
