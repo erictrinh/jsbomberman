@@ -229,6 +229,9 @@ movement_logic = (player) ->
 		else
 			if can_go(player).up
 				move_up(player)
+			# if we can't go that way, at least orient the player that way so it's responsive
+			else
+				player.facing = 'up'
 	# player is holding down the down key
 	else if player.down
 		# not on a snap axis
@@ -249,6 +252,9 @@ movement_logic = (player) ->
 		else
 			if can_go(player).down
 				move_down(player)
+			# if we can't go that way, at least orient the player that way so it's responsive
+			else
+				player.facing = 'down'
 	# player is holding down the left key
 	else if player.left
 		# not on a snap axis
@@ -269,6 +275,9 @@ movement_logic = (player) ->
 		else
 			if can_go(player).left
 				move_left(player)
+			# if we can't go that way, at least orient the player that way so it's responsive
+			else
+				player.facing = 'left'
 	# player is holding down the right key
 	else if player.right
 		# not on a snap axis
@@ -289,6 +298,9 @@ movement_logic = (player) ->
 		else
 			if can_go(player).right
 				move_right(player)
+			# if we can't go that way, at least orient the player that way so it's responsive
+			else
+				player.facing = 'right'
 
 game_logic = ->
 	for player in players

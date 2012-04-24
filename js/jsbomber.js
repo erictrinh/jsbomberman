@@ -266,6 +266,8 @@ movement_logic = function(player) {
     } else {
       if (can_go(player).up) {
         return move_up(player);
+      } else {
+        return player.facing = 'up';
       }
     }
   } else if (player.down) {
@@ -286,6 +288,8 @@ movement_logic = function(player) {
     } else {
       if (can_go(player).down) {
         return move_down(player);
+      } else {
+        return player.facing = 'down';
       }
     }
   } else if (player.left) {
@@ -306,6 +310,8 @@ movement_logic = function(player) {
     } else {
       if (can_go(player).left) {
         return move_left(player);
+      } else {
+        return player.facing = 'left';
       }
     }
   } else if (player.right) {
@@ -326,6 +332,8 @@ movement_logic = function(player) {
     } else {
       if (can_go(player).right) {
         return move_right(player);
+      } else {
+        return player.facing = 'right';
       }
     }
   }
