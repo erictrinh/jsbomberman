@@ -114,7 +114,11 @@ init_game = function() {
       } else if (object === 0) {
         if (Math.random() < 0.7) {
           if (Math.random() < 0.5) {
-            objects[r_index][c_index] = new Wood(true);
+            if (Math.random() < 0.5) {
+              objects[r_index][c_index] = new Wood('range_up');
+            } else {
+              objects[r_index][c_index] = new Wood('bomb_up');
+            }
           } else {
             objects[r_index][c_index] = new Wood();
           }
@@ -410,7 +414,7 @@ walkover_logic = function(player) {
     kind = objects[coords.row][coords.col].kind;
     if (kind === 'bomb_up') {
       player.num_bombs += 1;
-    } else if (kind === 'range-up') {
+    } else if (kind === 'range_up') {
       player.bomb_range += 1;
     }
     return objects[coords.row][coords.col] = new Empty();
@@ -634,8 +638,10 @@ set_explosion = function(r, c) {
   if (objects[r][c].type === 'explosion') {
     objects[r][c].count += 1;
   } else {
-    if (objects[r][c].type === 'wood' && objects[r][c].upgrade || objects[r][c].type === 'upgrade') {
-      setTimeout("set_upgrade(" + r + "," + c + ",'bomb_up')", 1000);
+    if (objects[r][c].type === 'wood' && objects[r][c].upgrade !== false) {
+      setTimeout("set_upgrade(" + r + "," + c + ",'" + objects[r][c].upgrade + "')", 1000);
+    } else if (objects[r][c].type === 'upgrade') {
+      setTimeout("set_upgrade(" + r + "," + c + ",'" + objects[r][c].kind + "')", 1000);
     }
     objects[r][c] = new Explosion();
   }
@@ -653,7 +659,7 @@ extinguish = function(r, c) {
 };
 
 set_upgrade = function(r, c, kind) {
-  return objects[r][c] = new Upgrade('bomb_up');
+  return objects[r][c] = new Upgrade(kind);
 };
 
 check_collisions = function() {

@@ -101,7 +101,11 @@ init_game = ->
 				if Math.random() < 0.7
 					# 0.5 chance of wooden block containing upgrade
 					if Math.random() < 0.5
-						objects[r_index][c_index] = new Wood(true)
+						# 0.5 chance of either bomb up or range up upgrade
+						if Math.random() < 0.5
+							objects[r_index][c_index] = new Wood('range_up')
+						else
+							objects[r_index][c_index] = new Wood('bomb_up')
 					else
 						objects[r_index][c_index] = new Wood()
 				else
@@ -359,7 +363,7 @@ walkover_logic = (player) ->
 		kind = objects[coords.row][coords.col].kind
 		if kind is 'bomb_up'
 			player.num_bombs+=1
-		else if kind is 'range-up'
+		else if kind is 'range_up'
 			player.bomb_range+=1
 		
 		# delete the upgrade once you've picked it up
@@ -566,8 +570,10 @@ set_explosion = (r, c) ->
 	else
 		# if this is a wood block containing an upgrade, set the block to the upgrade
 		# this happens after the explosion
-		if objects[r][c].type is 'wood' && objects[r][c].upgrade || objects[r][c].type is 'upgrade'
-			setTimeout("set_upgrade("+r+","+c+",'bomb_up')",1000)
+		if objects[r][c].type is 'wood' && objects[r][c].upgrade isnt false
+			setTimeout("set_upgrade("+r+","+c+",'"+objects[r][c].upgrade+"')",1000)
+		else if objects[r][c].type is 'upgrade'
+			setTimeout("set_upgrade("+r+","+c+",'"+objects[r][c].kind+"')",1000)
 		objects[r][c] = new Explosion()
 		
 	
@@ -583,7 +589,7 @@ extinguish = (r, c) ->
 
 # set an upgrade at the coordinates
 set_upgrade = (r, c, kind) ->
-	objects[r][c] = new Upgrade('bomb_up')
+	objects[r][c] = new Upgrade(kind)
 
 # check if any of the explosions hit the players
 check_collisions = ->
