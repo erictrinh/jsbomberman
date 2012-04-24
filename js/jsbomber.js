@@ -112,7 +112,7 @@ init_game = function() {
     facing: 'down',
     speed: 5,
     num_bombs: 3,
-    bomb_range: 1,
+    bomb_range: 10,
     controls: {
       up: 87,
       down: 83,
@@ -134,7 +134,7 @@ init_game = function() {
     },
     speed: 5,
     num_bombs: 3,
-    bomb_range: 1,
+    bomb_range: 3,
     controls: {
       up: 80,
       down: 186,
@@ -470,14 +470,16 @@ drop_bomb = function(x_pos, y_pos, pid, brange) {
 };
 
 explode = function(r, c) {
-  var bomb, pid, range;
+  var bomb, offset, pid, range, times;
   bomb = objects[r][c];
   clearTimeout(bomb.timer);
   pid = bomb.player_id;
   players[pid].num_bombs += 1;
   range = bomb.range;
   explosion_logic(r, c, range);
-  return shake_map(range);
+  offset = range;
+  times = Math.ceil(range / 5);
+  return shake_map(offset, times);
 };
 
 explosion_logic = function(r, c, range) {
@@ -582,14 +584,20 @@ player_collision = function(player) {
   }
 };
 
-shake_map = function(offset) {
-  return $('#map').animate({
-    left: '+=' + offset
-  }, 100, function() {
+shake_map = function(offset, times) {
+  var anitime;
+  if (times > 0) {
+    anitime = 100 / times;
     return $('#map').animate({
-      left: '-=' + offset
-    }, 100, function() {});
-  });
+      left: '+=' + offset
+    }, anitime, function() {
+      return $('#map').animate({
+        left: '-=' + offset
+      }, anitime, function() {
+        return shake_map(offset, times - 1);
+      });
+    });
+  }
 };
 
 $(function() {

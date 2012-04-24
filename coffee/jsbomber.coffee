@@ -98,7 +98,7 @@ init_game = ->
 		facing: 'down'
 		speed: 5
 		num_bombs: 3
-		bomb_range: 1
+		bomb_range: 10
 		controls:
 			up: 87
 			down: 83
@@ -117,7 +117,7 @@ init_game = ->
 			y: 425
 		speed: 5
 		num_bombs: 3
-		bomb_range: 1
+		bomb_range: 3
 		controls:
 			up: 80
 			down: 186
@@ -417,8 +417,13 @@ explode = (r, c) ->
 	# figure out the confines of the explosion
 	explosion_logic(r, c, range)
 	
+	# figure out how much to shake the map
+	# based off range of bombs 10
+	offset = range
+	times = Math.ceil(range/5)
+	
 	# shake the map
-	shake_map(range)
+	shake_map(offset, times)
 
 # given the coordinates of the epicenter and range of explosion
 # figure out which squares will be exploded/destroyed
@@ -514,15 +519,19 @@ player_collision = (player) ->
 	else
 		return false
 
-# shake the map left and right by offset during an explosion
-shake_map = (offset) ->
-	$('#map').animate
-		left: '+=' + offset
-		, 100, ->
-			$('#map').animate
-				left: '-=' + offset
-				, 100, ->
-					# callback
+# shake the map left and right by offset a certain number of times
+# the one and only time I will explicitly use recursion
+shake_map = (offset, times) ->
+	if times>0
+		# shake faster when you have to do it many times, then slow down
+		anitime = 100/times
+		$('#map').animate
+			left: '+=' + offset
+			, anitime, ->
+				$('#map').animate
+					left: '-=' + offset
+					, anitime, ->
+						shake_map(offset, times-1)
 
 $ ->
 	intro_screen()
