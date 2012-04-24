@@ -53,7 +53,7 @@ init_game = function() {
   game_started = true;
   bombs = [];
   explosions = [];
-  objects = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+  objects = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0, "stone", 0]];
   players[0] = {
     position: {
       x: 25,
@@ -151,22 +151,22 @@ can_go = function(player) {
   r = true;
   if (coords.col === 0 && player.position.x !== 25) {
     l = true;
-  } else if (player.position.x === 25 || coords.col === 0 || objects[coords.row][coords.col - 1] === 1) {
+  } else if (player.position.x === 25 || coords.col === 0 || objects[coords.row][coords.col - 1] === 'stone') {
     l = false;
   }
   if (coords.col === 14 && player.position.x !== 725) {
     r = true;
-  } else if (player.position.x === 725 || coords.col === 14 || objects[coords.row][coords.col + 1] === 1) {
+  } else if (player.position.x === 725 || coords.col === 14 || objects[coords.row][coords.col + 1] === 'stone') {
     r = false;
   }
   if (coords.row === 0 && player.position.y !== 25) {
     u = true;
-  } else if (player.position.y === 25 || coords.row === 0 || objects[coords.row - 1][coords.col] === 1) {
+  } else if (player.position.y === 25 || coords.row === 0 || objects[coords.row - 1][coords.col] === 'stone') {
     u = false;
   }
   if (coords.row === 8 && player.position.y !== 425) {
     d = true;
-  } else if (player.position.y === 425 || coords.row === 8 || objects[coords.row + 1][coords.col] === 1) {
+  } else if (player.position.y === 425 || coords.row === 8 || objects[coords.row + 1][coords.col] === 'stone') {
     d = false;
   }
   return {
@@ -331,7 +331,7 @@ update_map = function() {
     for (c_index = _k = 0, _len2 = row.length; _k < _len2; c_index = ++_k) {
       column = row[c_index];
       grid_square = objects[r_index][c_index];
-      if (grid_square === 1) {
+      if (grid_square === 'stone') {
         $('#map').drawRect({
           fillStyle: '#777777',
           x: c_index * 50 + 25,
@@ -340,7 +340,7 @@ update_map = function() {
           height: 50,
           fromCenter: true
         });
-      } else if (grid_square === 2) {
+      } else if (grid_square === 'explosion') {
         $('#map').drawRect({
           fillStyle: '#f90c22',
           x: c_index * 50 + 25,
@@ -349,7 +349,7 @@ update_map = function() {
           height: 50,
           fromCenter: true
         });
-      } else if (grid_square === 3) {
+      } else if (grid_square === 'bomb') {
         $('#map').drawRect({
           fillStyle: '#0c9df9',
           x: c_index * 50 + 25,
@@ -415,7 +415,7 @@ drop_bomb = function(x_pos, y_pos, pid, brange) {
   });
   c = (x_pos - 25) / 50;
   r = (y_pos - 25) / 50;
-  return objects[r][c] = 3;
+  return objects[r][c] = 'bomb';
 };
 
 explode_bomb = function(index) {
@@ -447,25 +447,25 @@ draw_explosion = function(explosion) {
   var c, countdown, r, temp_c, temp_r, _results;
   c = (explosion.x - 25) / 50;
   r = (explosion.y - 25) / 50;
-  objects[r][c] = 2;
+  objects[r][c] = 'explosion';
   countdown = explosion.r;
   temp_r = r - 1;
   while (countdown > 0 && temp_r >= 0 && objects[temp_r][c] === 0) {
-    objects[temp_r][c] = 2;
+    objects[temp_r][c] = 'explosion';
     temp_r -= 1;
     countdown -= 1;
   }
   countdown = explosion.r;
   temp_r = r + 1;
   while (countdown > 0 && temp_r <= 8 && objects[temp_r][c] === 0) {
-    objects[temp_r][c] = 2;
+    objects[temp_r][c] = 'explosion';
     temp_r += 1;
     countdown -= 1;
   }
   countdown = explosion.r;
   temp_c = c - 1;
   while (countdown > 0 && temp_c >= 0 && objects[r][temp_c] === 0) {
-    objects[r][temp_c] = 2;
+    objects[r][temp_c] = 'explosion';
     temp_c -= 1;
     countdown -= 1;
   }
@@ -473,7 +473,7 @@ draw_explosion = function(explosion) {
   temp_c = c + 1;
   _results = [];
   while (countdown > 0 && temp_c <= 14 && objects[r][temp_c] === 0) {
-    objects[r][temp_c] = 2;
+    objects[r][temp_c] = 'explosion';
     temp_c += 1;
     _results.push(countdown -= 1);
   }
@@ -492,21 +492,21 @@ draw_extinguish = function(explosion) {
   objects[r][c] = 0;
   countdown = explosion.r;
   temp_r = r - 1;
-  while (countdown > 0 && temp_r >= 0 && objects[temp_r][c] === 2) {
+  while (countdown > 0 && temp_r >= 0 && objects[temp_r][c] === 'explosion') {
     objects[temp_r][c] = 0;
     temp_r -= 1;
     countdown -= 1;
   }
   countdown = explosion.r;
   temp_r = r + 1;
-  while (countdown > 0 && temp_r <= 8 && objects[temp_r][c] === 2) {
+  while (countdown > 0 && temp_r <= 8 && objects[temp_r][c] === 'explosion') {
     objects[temp_r][c] = 0;
     temp_r += 1;
     countdown -= 1;
   }
   countdown = explosion.r;
   temp_c = c - 1;
-  while (countdown > 0 && temp_c >= 0 && objects[r][temp_c] === 2) {
+  while (countdown > 0 && temp_c >= 0 && objects[r][temp_c] === 'explosion') {
     objects[r][temp_c] = 0;
     temp_c -= 1;
     countdown -= 1;
@@ -514,7 +514,7 @@ draw_extinguish = function(explosion) {
   countdown = explosion.r;
   temp_c = c + 1;
   _results = [];
-  while (countdown > 0 && temp_c <= 14 && objects[r][temp_c] === 2) {
+  while (countdown > 0 && temp_c <= 14 && objects[r][temp_c] === 'explosion') {
     objects[r][temp_c] = 0;
     temp_c += 1;
     _results.push(countdown -= 1);
