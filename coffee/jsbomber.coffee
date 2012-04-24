@@ -1,6 +1,5 @@
 # global vars
 players = new Array()
-explosions = new Array()
 objects = new Array()
 timer = null
 game_started = false
@@ -90,7 +89,6 @@ init_game = ->
 	$('#rangebombs').text(1)
 	$('#awesomeness').html('&#8734;')
 	game_started = true
-	explosions = []
 	# initialize objects as a 2d array and add stone blocks
 	# objects
 	# stone, wood, bomb, explosion, upgrade
