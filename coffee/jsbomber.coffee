@@ -42,7 +42,7 @@ init_game = ->
 	bombs = []
 	explosions = []
 	# initialize objects as a 2d array and add stone blocks
-	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0]]
+	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 	players[0] = 
 		position:
 			x: 25
@@ -160,89 +160,91 @@ move_left = (player) ->
 move_right = (player) ->
 	player.facing = 'right'
 	player.position.x += player.speed
+movement_logic = (player) ->
+	# player is holding down the up key
+	if player.up
+		# not on a snap axis
+		if on_snap_x(player) isnt player.position.x
+			# if no obstacle there, move towards the snap coordinate
+			if can_go(player).up
+				if on_snap_x(player) > player.position.x
+					move_right(player)
+				else
+					move_left(player)
+			# otherwise, move in the opposite direction
+			else
+				if on_snap_x(player) > player.position.x
+					move_left(player)
+				else
+					move_right(player)
+		# this is on a snap axis, so move normally IF no obstacle there
+		else
+			if can_go(player).up
+				move_up(player)
+	# player is holding down the down key
+	else if player.down
+		# not on a snap axis
+		if on_snap_x(player) isnt player.position.x
+			# if no obstacle there, move towards the snap coordinate
+			if can_go(player).down
+				if on_snap_x(player) > player.position.x
+					move_right(player)
+				else
+					move_left(player)
+			# otherwise, move in the opposite direction
+			else
+				if on_snap_x(player) > player.position.x
+					move_left(player)
+				else
+					move_right(player)
+		# this is on a snap axis, so move normally
+		else
+			if can_go(player).down
+				move_down(player)
+	# player is holding down the left key
+	else if player.left
+		# not on a snap axis
+		if on_snap_y(player) isnt player.position.y
+			# if no obstacle there, move towards the snap coordinate
+			if can_go(player).left
+				if on_snap_y(player) > player.position.y
+					move_down(player)
+				else
+					move_up(player)
+			# otherwise, move in the opposite direction
+			else
+				if on_snap_y(player) > player.position.y
+					move_up(player)
+				else
+					move_down(player)
+		# this is on a snap axis, so move normally
+		else
+			if can_go(player).left
+				move_left(player)
+	# player is holding down the right key
+	else if player.right
+		# not on a snap axis
+		if on_snap_y(player) isnt player.position.y
+			# if no obstacle there, move towards the snap coordinate
+			if can_go(player).right
+				if on_snap_y(player) > player.position.y
+					move_down(player)
+				else
+					move_up(player)
+			# otherwise, move in the opposite direction
+			else
+				if on_snap_y(player) > player.position.y
+					move_up(player)
+				else
+					move_down(player)
+		# this is on a snap axis, so move normally
+		else
+			if can_go(player).right
+				move_right(player)
 
 game_logic = ->
 	for player in players
-		# player is holding down the up key
-		if player.up
-			# not on a snap axis
-			if on_snap_x(player) isnt player.position.x
-				# if no obstacle there, move towards the snap coordinate
-				if can_go(player).up
-					if on_snap_x(player) > player.position.x
-						move_right(player)
-					else
-						move_left(player)
-				# otherwise, move in the opposite direction
-				else
-					if on_snap_x(player) > player.position.x
-						move_left(player)
-					else
-						move_right(player)
-			# this is on a snap axis, so move normally IF no obstacle there
-			else
-				if can_go(player).up
-					move_up(player)
-		# player is holding down the down key
-		else if player.down
-			# not on a snap axis
-			if on_snap_x(player) isnt player.position.x
-				# if no obstacle there, move towards the snap coordinate
-				if can_go(player).down
-					if on_snap_x(player) > player.position.x
-						move_right(player)
-					else
-						move_left(player)
-				# otherwise, move in the opposite direction
-				else
-					if on_snap_x(player) > player.position.x
-						move_left(player)
-					else
-						move_right(player)
-			# this is on a snap axis, so move normally
-			else
-				if can_go(player).down
-					move_down(player)
-		# player is holding down the left key
-		else if player.left
-			# not on a snap axis
-			if on_snap_y(player) isnt player.position.y
-				# if no obstacle there, move towards the snap coordinate
-				if can_go(player).left
-					if on_snap_y(player) > player.position.y
-						move_down(player)
-					else
-						move_up(player)
-				# otherwise, move in the opposite direction
-				else
-					if on_snap_y(player) > player.position.y
-						move_up(player)
-					else
-						move_down(player)
-			# this is on a snap axis, so move normally
-			else
-				if can_go(player).left
-					move_left(player)
-		# player is holding down the right key
-		else if player.right
-			# not on a snap axis
-			if on_snap_y(player) isnt player.position.y
-				# if no obstacle there, move towards the snap coordinate
-				if can_go(player).right
-					if on_snap_y(player) > player.position.y
-						move_down(player)
-					else
-						move_up(player)
-				# otherwise, move in the opposite direction
-				else
-					if on_snap_y(player) > player.position.y
-						move_up(player)
-					else
-						move_down(player)
-			# this is on a snap axis, so move normally
-			else
-				if can_go(player).right
-					move_right(player)
+		movement_logic(player)
 
 	update_map()
 	if check_collisions()
