@@ -98,7 +98,7 @@ init_game = ->
 		facing: 'down'
 		speed: 5
 		num_bombs: 3
-		bomb_range: 10
+		bomb_range: 3
 		controls:
 			up: 87
 			down: 83
@@ -552,7 +552,8 @@ $(document).bind 'keydown', (e) ->
 			else if e.which is player.controls.right
 				player.right = true
 			else if e.which is player.controls.drop
-				if player.num_bombs>0
+				coords = get_grid_coords(player)
+				if player.num_bombs>0 && objects[coords.row][coords.col].type isnt 'bomb'
 					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range)
 					player.num_bombs -= 1
 		return false
