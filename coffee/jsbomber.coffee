@@ -109,65 +109,128 @@ on_snap_y = (player) ->
 	else
 		return y
 
+# get the grid coordinates for a player
+get_grid_coords = (player) ->
+	x = on_snap_x(player)
+	y = on_snap_y(player)
+	c = (x-25)/50
+	r = (y-25)/50
+	return {row: r, col: c}
+
+# check if player can go up, down, left, right
+# returns object literal with possible moves
+can_go = (player) ->
+	coords = get_grid_coords(player)
+	u = true
+	d = true
+	l = true
+	r = true
+	# cross reference object map
+	if player.position.x is 25 || coords.col is 0 || objects[coords.row][coords.col-1] is 1
+		l = false
+	if player.position.x is 725 || coords.col is 14 || objects[coords.row][coords.col+1] is 1
+		r = false
+	if player.position.y is 25 || coords.row is 0 || objects[coords.row-1][coords.col] is 1
+		u = false
+	if player.position.y is 425 || coords.row is 8 || objects[coords.row+1][coords.col] is 1
+		d = false
+	return {up: u, down: d, left: l, right: r}
+	
+move_up = (player) ->
+	player.facing = 'up'
+	player.position.y -= player.speed
+move_down = (player) ->
+	player.facing = 'down'
+	player.position.y += player.speed
+move_left = (player) ->
+	player.facing = 'left'
+	player.position.x -= player.speed
+move_right = (player) ->
+	player.facing = 'right'
+	player.position.x += player.speed
+
 game_logic = ->
 	for player in players
 		# player is holding down the up key
 		if player.up
 			# not on a snap axis
 			if on_snap_x(player) isnt player.position.x
-				# move towards the snap coordinate
-				if on_snap_x(player) > player.position.x
-					player.position.x += player.speed
+				# if no obstacle there, move towards the snap coordinate
+				if can_go(player).up
+					if on_snap_x(player) > player.position.x
+						move_right(player)
+					else
+						move_left(player)
+				# otherwise, move in the opposite direction
 				else
-					player.position.x -= player.speed
-			# this is on a snap axis, so move normally
+					if on_snap_x(player) > player.position.x
+						move_left(player)
+					else
+						move_right(player)
+			# this is on a snap axis, so move normally IF no obstacle there
 			else
-				player.position.y -= player.speed
+				if can_go(player).up
+					move_up(player)
 		# player is holding down the down key
 		else if player.down
 			# not on a snap axis
 			if on_snap_x(player) isnt player.position.x
-				# move towards the snap coordinate
-				if on_snap_x(player) > player.position.x
-					player.position.x += player.speed
+				# if no obstacle there, move towards the snap coordinate
+				if can_go(player).down
+					if on_snap_x(player) > player.position.x
+						move_right(player)
+					else
+						move_left(player)
+				# otherwise, move in the opposite direction
 				else
-					player.position.x -= player.speed
+					if on_snap_x(player) > player.position.x
+						move_left(player)
+					else
+						move_right(player)
 			# this is on a snap axis, so move normally
 			else
-				player.position.y += player.speed
+				if can_go(player).down
+					move_down(player)
 		# player is holding down the left key
 		else if player.left
 			# not on a snap axis
 			if on_snap_y(player) isnt player.position.y
-				# move towards the snap coordinate
-				if on_snap_y(player) > player.position.y
-					player.position.y += player.speed
+				# if no obstacle there, move towards the snap coordinate
+				if can_go(player).left
+					if on_snap_y(player) > player.position.y
+						move_down(player)
+					else
+						move_up(player)
+				# otherwise, move in the opposite direction
 				else
-					player.position.y -= player.speed
+					if on_snap_y(player) > player.position.y
+						move_up(player)
+					else
+						move_down(player)
 			# this is on a snap axis, so move normally
 			else
-				player.position.x -= player.speed
+				if can_go(player).left
+					move_left(player)
 		# player is holding down the right key
 		else if player.right
 			# not on a snap axis
 			if on_snap_y(player) isnt player.position.y
-				# move towards the snap coordinate
-				if on_snap_y(player) > player.position.y
-					player.position.y += player.speed
+				# if no obstacle there, move towards the snap coordinate
+				if can_go(player).right
+					if on_snap_y(player) > player.position.y
+						move_down(player)
+					else
+						move_up(player)
+				# otherwise, move in the opposite direction
 				else
-					player.position.y -= player.speed
+					if on_snap_y(player) > player.position.y
+						move_up(player)
+					else
+						move_down(player)
 			# this is on a snap axis, so move normally
 			else
-				player.position.x += player.speed
-		# make sure players stay inside map
-		if player.position.y < 25
-			player.position.y = 25
-		else if player.position.y > 425
-			player.position.y = 425
-		if player.position.x < 25
-			player.position.x = 25
-		else if player.position.x > 725
-			player.position.x = 725
+				if can_go(player).right
+					move_right(player)
 
 	update_map()
 	if check_collisions()
@@ -332,16 +395,12 @@ $(document).bind 'keydown', (e) ->
 		for player, player_id in players
 			if e.which is player.controls.up
 				player.up = true
-				player.facing = 'up'
 			else if e.which is player.controls.down
 				player.down = true
-				player.facing = 'down'
 			else if e.which is player.controls.left
 				player.left = true
-				player.facing = 'left'
 			else if e.which is player.controls.right
 				player.right = true
-				player.facing = 'right'
 			else if e.which is player.controls.drop
 				if player.num_bombs>0
 					drop_bomb(on_snap_x(player), on_snap_y(player), player_id, player.bomb_range)
