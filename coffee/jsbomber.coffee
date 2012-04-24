@@ -36,13 +36,53 @@ game_over_screen = (text) ->
 		text: "Play again? (Spacebar)"
 		font: '25pt Helvetica, sans-serif'
 
+## the following defines the types of objects that can be found on the map
+
+# this is a stone object
+Stone = ->
+	this.type = 'stone'
+	# is this object affected by bombs?
+	this.destructible = false
+	# can you walk through/on top of this object?
+	this.walkable = false
+# this is a wood object
+Wood = ->
+	this.type = 'wood'
+	this.destructible = true
+	this.walkable = false
+# this is a bomb, also stores range and the player_id (index of the player that dropped it) 
+Bomb = (r, pid) ->
+	this.type = 'bomb'
+	this.destructible = true
+	this.walkable = false
+	this.range = r
+	this.player_id = pid
+# this is an explosion
+Explosion = ->
+	this.type = 'explosion'
+	this.destructible = false
+	this.walkable = true
+# this is an upgrade
+Upgrade = (k) ->
+	this.type = 'upgrade'
+	this.destructible = false
+	this.walkable = true
+	this.kind = k
+
 # initialize the game with 2 players
 init_game = ->
 	game_started = true
 	bombs = []
 	explosions = []
 	# initialize objects as a 2d array and add stone blocks
-	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0,"stone",0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+	# objects
+	# stone, wood, bomb, explosion, upgrade
+	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+	for row, r_index in objects
+		for object, c_index in row
+			if object is 1
+				objects[r_index][c_index] = new Stone()
+	
 	players[0] = 
 		position:
 			x: 25
@@ -132,19 +172,19 @@ can_go = (player) ->
 	if coords.col is 0 && player.position.x isnt 25
 		l = true
 	# you're on the edge now, can't let you move that way anymore, sorry
-	else if player.position.x is 25 || coords.col is 0 || objects[coords.row][coords.col-1] is 'stone'
+	else if player.position.x is 25 || coords.col is 0 || objects[coords.row][coords.col-1].type is 'stone'
 		l = false
 	if coords.col is 14 && player.position.x isnt 725
 		r = true
-	else if player.position.x is 725 || coords.col is 14 || objects[coords.row][coords.col+1] is 'stone'
+	else if player.position.x is 725 || coords.col is 14 || objects[coords.row][coords.col+1].type is 'stone'
 		r = false
 	if coords.row is 0 && player.position.y isnt 25
 		u = true
-	else if player.position.y is 25 || coords.row is 0 || objects[coords.row-1][coords.col] is 'stone'
+	else if player.position.y is 25 || coords.row is 0 || objects[coords.row-1][coords.col].type is 'stone'
 		u = false
 	if coords.row is 8 && player.position.y isnt 425
 		d = true
-	else if player.position.y is 425 || coords.row is 8 || objects[coords.row+1][coords.col] is 'stone'
+	else if player.position.y is 425 || coords.row is 8 || objects[coords.row+1][coords.col].type is 'stone'
 		d = false
 	return {up: u, down: d, left: l, right: r}
 	
@@ -280,7 +320,7 @@ update_map = ->
 	for row, r_index in objects
 		for column, c_index in row
 			grid_square = objects[r_index][c_index]
-			if grid_square is 'stone'
+			if grid_square.type is 'stone'
 				$('#map').drawRect
 					fillStyle: '#777777'
 					x: c_index*50+25
@@ -288,7 +328,7 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
-			else if grid_square is 'explosion'
+			else if grid_square.type is 'explosion'
 				$('#map').drawRect
 					fillStyle: '#f90c22'
 					x: c_index*50+25
@@ -296,7 +336,7 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
-			else if grid_square is 'bomb'
+			else if grid_square.type is 'bomb'
 				$('#map').drawRect
 					fillStyle: '#0c9df9'
 					x: c_index*50+25
@@ -342,7 +382,7 @@ drop_bomb = (x_pos, y_pos, pid, brange) ->
 	# get grid coordinates of bomb
 	c = (x_pos-25)/50
 	r = (y_pos-25)/50
-	objects[r][c] = 'bomb'
+	objects[r][c] = new Bomb(brange, pid)
 
 explode_bomb = (index=0) ->
 	clearTimeout(bombs[index].timer)
@@ -369,13 +409,13 @@ draw_explosion = (explosion) ->
 	r = (explosion.y-25)/50
 	
 	# set this grid square to an explosion square
-	objects[r][c] = 'explosion'
+	objects[r][c] = new Explosion()
 	
 	# figure out if bomb can explode upward
 	countdown = explosion.r # range of the bomb
 	temp_r = r-1
 	while countdown > 0 && temp_r >= 0 && objects[temp_r][c] is 0
-		objects[temp_r][c] = 'explosion'
+		objects[temp_r][c] = new Explosion()
 		temp_r -= 1
 		countdown -= 1
 		
@@ -383,7 +423,7 @@ draw_explosion = (explosion) ->
 	countdown = explosion.r # range of the bomb
 	temp_r = r+1
 	while countdown > 0 && temp_r <= 8 && objects[temp_r][c] is 0
-		objects[temp_r][c] = 'explosion'
+		objects[temp_r][c] = new Explosion()
 		temp_r += 1
 		countdown -= 1
 		
@@ -391,7 +431,7 @@ draw_explosion = (explosion) ->
 	countdown = explosion.r # range of the bomb
 	temp_c = c-1
 	while countdown > 0 && temp_c >= 0 && objects[r][temp_c] is 0
-		objects[r][temp_c] = 'explosion'
+		objects[r][temp_c] = new Explosion()
 		temp_c -= 1
 		countdown -= 1
 	
@@ -399,7 +439,7 @@ draw_explosion = (explosion) ->
 	countdown = explosion.r # range of the bomb
 	temp_c = c+1
 	while countdown > 0 && temp_c <= 14 && objects[r][temp_c] is 0
-		objects[r][temp_c] = 'explosion'
+		objects[r][temp_c] = new Explosion()
 		temp_c += 1
 		countdown -= 1
 
@@ -418,7 +458,7 @@ draw_extinguish = (explosion) ->
 	# figure out if bomb can explode upward
 	countdown = explosion.r # range of the bomb
 	temp_r = r-1
-	while countdown > 0 && temp_r >= 0 && objects[temp_r][c] is 'explosion'
+	while countdown > 0 && temp_r >= 0 && objects[temp_r][c].type is 'explosion'
 		objects[temp_r][c] = 0
 		temp_r -= 1
 		countdown -= 1
@@ -426,7 +466,7 @@ draw_extinguish = (explosion) ->
 	# figure out if bomb can explode downward
 	countdown = explosion.r # range of the bomb
 	temp_r = r+1
-	while countdown > 0 && temp_r <= 8 && objects[temp_r][c] is 'explosion'
+	while countdown > 0 && temp_r <= 8 && objects[temp_r][c].type is 'explosion'
 		objects[temp_r][c] = 0
 		temp_r += 1
 		countdown -= 1
@@ -434,7 +474,7 @@ draw_extinguish = (explosion) ->
 	# figure out if bomb can explode leftward
 	countdown = explosion.r # range of the bomb
 	temp_c = c-1
-	while countdown > 0 && temp_c >= 0 && objects[r][temp_c] is 'explosion'
+	while countdown > 0 && temp_c >= 0 && objects[r][temp_c].type is 'explosion'
 		objects[r][temp_c] = 0
 		temp_c -= 1
 		countdown -= 1
@@ -442,7 +482,7 @@ draw_extinguish = (explosion) ->
 	# figure out if bomb can explode rightward
 	countdown = explosion.r # range of the bomb
 	temp_c = c+1
-	while countdown > 0 && temp_c <= 14 && objects[r][temp_c] is 'explosion'
+	while countdown > 0 && temp_c <= 14 && objects[r][temp_c].type is 'explosion'
 		objects[r][temp_c] = 0
 		temp_c += 1
 		countdown -= 1
