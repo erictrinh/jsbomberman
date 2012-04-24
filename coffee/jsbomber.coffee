@@ -274,7 +274,8 @@ update_map = ->
 				y2: num
 	for row, r_index in objects
 		for column, c_index in row
-			if objects[r_index][c_index] is 1
+			grid_square = objects[r_index][c_index]
+			if grid_square is 1
 				$('#map').drawRect
 					fillStyle: '#777777'
 					x: c_index*50+25
@@ -282,6 +283,15 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
+			else if grid_square is 2
+				$('#map').drawRect
+					fillStyle: '#f90c22'
+					x: c_index*50+25
+					y: r_index*50+25
+					width: 50
+					height: 50
+					fromCenter: true
+			
 	for elem in bombs
 		$('#map').drawRect
 			fillStyle: '#0c9df9'
@@ -291,20 +301,7 @@ update_map = ->
 			height: 40
 			fromCenter: true
 	for elem in explosions
-		$('#map').drawLine
-			strokeStyle: "#f90c22"
-			strokeWidth: 2
-			x1: elem.x
-			y1: elem.y - elem.r*50 + 25
-			x2: elem.x
-			y2: elem.y + elem.r*50 + 25
-		.drawLine
-			strokeStyle: "#f90c22"
-			strokeWidth: 2
-			x1: elem.x - elem.r*50 + 25
-			y1: elem.y
-			x2: elem.x + elem.r*50 + 25
-			y2: elem.y
+		draw_explosion(elem)
 	for player in players
 		$('#map').drawRect
 			fillStyle: '#fff'
@@ -349,13 +346,92 @@ explode_bomb = (index=0) ->
 
 explosion = (x_pos, y_pos, range) ->
 	shake_map(range)
-	
 	explosions.push({x: x_pos, y: y_pos, r: range})
-	
 	setTimeout("extinguish_explosion()",1000)
 
+draw_explosion = (explosion) ->
+	# get grid coordinates of explosion
+	c = (explosion.x-25)/50
+	r = (explosion.y-25)/50
+	
+	# set this grid square to an explosion square
+	objects[r][c] = 2
+	
+	# figure out if bomb can explode upward
+	countdown = explosion.r # range of the bomb
+	temp_r = r-1
+	while countdown > 0 && temp_r >= 0 && objects[temp_r][c] is 0
+		objects[temp_r][c] = 2
+		temp_r -= 1
+		countdown -= 1
+		
+	# figure out if bomb can explode downward
+	countdown = explosion.r # range of the bomb
+	temp_r = r+1
+	while countdown > 0 && temp_r <= 8 && objects[temp_r][c] is 0
+		objects[temp_r][c] = 2
+		temp_r += 1
+		countdown -= 1
+		
+	# figure out if bomb can explode leftward
+	countdown = explosion.r # range of the bomb
+	temp_c = c-1
+	while countdown > 0 && temp_c >= 0 && objects[r][temp_c] is 0
+		objects[r][temp_c] = 2
+		temp_c -= 1
+		countdown -= 1
+	
+	# figure out if bomb can explode rightward
+	countdown = explosion.r # range of the bomb
+	temp_c = c+1
+	while countdown > 0 && temp_c <= 14 && objects[r][temp_c] is 0
+		objects[r][temp_c] = 2
+		temp_c += 1
+		countdown -= 1
+
 extinguish_explosion = ->
+	draw_extinguish(explosions[0])
 	explosions.splice(0,1)
+
+draw_extinguish = (explosion) ->
+	# get grid coordinates of explosion
+	c = (explosion.x-25)/50
+	r = (explosion.y-25)/50
+	
+	# set this grid square to an empty square
+	objects[r][c] = 0
+	
+	# figure out if bomb can explode upward
+	countdown = explosion.r # range of the bomb
+	temp_r = r-1
+	while countdown > 0 && temp_r >= 0 && objects[temp_r][c] is 2
+		objects[temp_r][c] = 0
+		temp_r -= 1
+		countdown -= 1
+		
+	# figure out if bomb can explode downward
+	countdown = explosion.r # range of the bomb
+	temp_r = r+1
+	while countdown > 0 && temp_r <= 8 && objects[temp_r][c] is 2
+		objects[temp_r][c] = 0
+		temp_r += 1
+		countdown -= 1
+		
+	# figure out if bomb can explode leftward
+	countdown = explosion.r # range of the bomb
+	temp_c = c-1
+	while countdown > 0 && temp_c >= 0 && objects[r][temp_c] is 2
+		objects[r][temp_c] = 0
+		temp_c -= 1
+		countdown -= 1
+	
+	# figure out if bomb can explode rightward
+	countdown = explosion.r # range of the bomb
+	temp_c = c+1
+	while countdown > 0 && temp_c <= 14 && objects[r][temp_c] is 2
+		objects[r][temp_c] = 0
+		temp_c += 1
+		countdown -= 1
 
 # check if any of the explosions hit the players
 check_collisions = ->
@@ -376,11 +452,6 @@ check_collisions = ->
 		return false
 player_collision = (player, explosion) ->
 	if (player.position.x-25/2 < explosion.x < player.position.x+25/2 && Math.abs(player.position.y-explosion.y) < explosion.r*50+25) || (player.position.y-25/2 < explosion.y < player.position.y+25/2 && Math.abs(player.position.x-explosion.x) < explosion.r*50+25)
-		return true
-	else
-		return false
-bomb_collision = (bomb, explosion) ->
-	if bomb.x-40/2 < explosion.x < bomb.x+40/2 || bomb.y-40/2 < explosion.y < bomb.y+40/2
 		return true
 	else
 		return false
