@@ -421,11 +421,11 @@ walkover_logic = function(player) {
   coords = get_grid_coords(player);
   if (objects[coords.row][coords.col].type === 'upgrade') {
     kind = objects[coords.row][coords.col].kind;
-    if (kind === 'bomb_up' && player.bomb_supply.max_number <= 9) {
+    if (kind === 'bomb_up' && player.bomb_supply.max_number < 10) {
       player.bomb_supply.max_number += 1;
       player.bomb_supply.number += 1;
       $('#numbombs').text(player.bomb_supply.max_number);
-    } else if (kind === 'range_up' && player.bomb_supply.range <= 9) {
+    } else if (kind === 'range_up' && player.bomb_supply.range < 10) {
       player.bomb_supply.range += 1;
       $('#rangebombs').text(player.bomb_supply.range);
     }

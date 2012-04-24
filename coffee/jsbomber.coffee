@@ -368,11 +368,11 @@ walkover_logic = (player) ->
 	# if it's an upgrade, modify the player in some way
 	if objects[coords.row][coords.col].type is 'upgrade'
 		kind = objects[coords.row][coords.col].kind
-		if kind is 'bomb_up' && player.bomb_supply.max_number <= 9 # max number of bombs
+		if kind is 'bomb_up' && player.bomb_supply.max_number < 10 # max number of bombs
 			player.bomb_supply.max_number+=1
 			player.bomb_supply.number+=1
 			$('#numbombs').text(player.bomb_supply.max_number)
-		else if kind is 'range_up'&& player.bomb_supply.range <= 9 # max range
+		else if kind is 'range_up'&& player.bomb_supply.range < 10 # max range
 			player.bomb_supply.range+=1
 			$('#rangebombs').text(player.bomb_supply.range)
 		
