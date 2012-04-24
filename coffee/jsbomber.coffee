@@ -7,29 +7,31 @@ timer = null
 game_started = false
 
 intro_screen = ->
+	center = $('#map').width()/2
 	$('#map').drawText
 		fillStyle: '#000'
-		x: 250
+		x: center
 		y: 100
 		text: 'JSBomber'
 		font: '60pt Helvetica, sans-serif'
 	.drawText
 		fillStyle: '#000'
-		x: 250
+		x: center
 		y: 300
 		text: "Press 'spacebar' to start"
 		font: '25pt Helvetica, sans-serif'
 
 game_over_screen = (text) ->
+	center = $('#map').width()/2
 	$('#map').drawText
 		fillStyle: '#000'
-		x: 250
+		x: center
 		y: 100
 		text: text
 		font: '50pt Helvetica, sans-serif'
 	.drawText
 		fillStyle: '#000'
-		x: 250
+		x: center
 		y: 300
 		text: "Play again? (Spacebar)"
 		font: '25pt Helvetica, sans-serif'
@@ -39,6 +41,8 @@ init_game = ->
 	game_started = true
 	bombs = []
 	explosions = []
+	# initialize objects as a 2d array and add stone blocks
+	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 	players[0] = 
 		position:
 			x: 25
@@ -193,6 +197,16 @@ update_map = ->
 				y1: num
 				x2: 750
 				y2: num
+	for row, r_index in objects
+		for column, c_index in row
+			if objects[r_index][c_index] is 1
+				$('#map').drawRect
+					fillStyle: '#777777'
+					x: c_index*50+25
+					y: r_index*50+25
+					width: 50
+					height: 50
+					fromCenter: true
 	for elem in bombs
 		$('#map').drawRect
 			fillStyle: '#0c9df9'

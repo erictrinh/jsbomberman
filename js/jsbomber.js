@@ -14,15 +14,17 @@ timer = null;
 game_started = false;
 
 intro_screen = function() {
+  var center;
+  center = $('#map').width() / 2;
   return $('#map').drawText({
     fillStyle: '#000',
-    x: 250,
+    x: center,
     y: 100,
     text: 'JSBomber',
     font: '60pt Helvetica, sans-serif'
   }).drawText({
     fillStyle: '#000',
-    x: 250,
+    x: center,
     y: 300,
     text: "Press 'spacebar' to start",
     font: '25pt Helvetica, sans-serif'
@@ -30,15 +32,17 @@ intro_screen = function() {
 };
 
 game_over_screen = function(text) {
+  var center;
+  center = $('#map').width() / 2;
   return $('#map').drawText({
     fillStyle: '#000',
-    x: 250,
+    x: center,
     y: 100,
     text: text,
     font: '50pt Helvetica, sans-serif'
   }).drawText({
     fillStyle: '#000',
-    x: 250,
+    x: center,
     y: 300,
     text: "Play again? (Spacebar)",
     font: '25pt Helvetica, sans-serif'
@@ -49,6 +53,7 @@ init_game = function() {
   game_started = true;
   bombs = [];
   explosions = [];
+  objects = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
   players[0] = {
     position: {
       x: 25,
@@ -191,7 +196,7 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var arc_end, arc_start, elem, num, overlay, player, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
+  var arc_end, arc_start, c_index, column, elem, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _results;
   $('#map').clearCanvas();
   template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   overlay = (function() {
@@ -224,8 +229,24 @@ update_map = function() {
       });
     }
   }
-  for (_j = 0, _len1 = bombs.length; _j < _len1; _j++) {
-    elem = bombs[_j];
+  for (r_index = _j = 0, _len1 = objects.length; _j < _len1; r_index = ++_j) {
+    row = objects[r_index];
+    for (c_index = _k = 0, _len2 = row.length; _k < _len2; c_index = ++_k) {
+      column = row[c_index];
+      if (objects[r_index][c_index] === 1) {
+        $('#map').drawRect({
+          fillStyle: '#777777',
+          x: c_index * 50 + 25,
+          y: r_index * 50 + 25,
+          width: 50,
+          height: 50,
+          fromCenter: true
+        });
+      }
+    }
+  }
+  for (_l = 0, _len3 = bombs.length; _l < _len3; _l++) {
+    elem = bombs[_l];
     $('#map').drawRect({
       fillStyle: '#0c9df9',
       x: elem.x,
@@ -235,8 +256,8 @@ update_map = function() {
       fromCenter: true
     });
   }
-  for (_k = 0, _len2 = explosions.length; _k < _len2; _k++) {
-    elem = explosions[_k];
+  for (_m = 0, _len4 = explosions.length; _m < _len4; _m++) {
+    elem = explosions[_m];
     $('#map').drawLine({
       strokeStyle: "#f90c22",
       strokeWidth: 2,
@@ -254,8 +275,8 @@ update_map = function() {
     });
   }
   _results = [];
-  for (_l = 0, _len3 = players.length; _l < _len3; _l++) {
-    player = players[_l];
+  for (_n = 0, _len5 = players.length; _n < _len5; _n++) {
+    player = players[_n];
     $('#map').drawRect({
       fillStyle: '#fff',
       x: player.position.x,
