@@ -390,8 +390,8 @@ update_map = ->
 	# draw the things on the map, using objects array as a template
 	for row, r_index in objects
 		for column, c_index in row
-			sq_type = objects[r_index][c_index].type
-			if sq_type is 'stone'
+			sq = objects[r_index][c_index]
+			if sq.type is 'stone'
 				$('#map').drawRect
 					fillStyle: '#777777'
 					x: c_index*50+25
@@ -399,7 +399,7 @@ update_map = ->
 					width: 45
 					height: 45
 					fromCenter: true
-			else if sq_type is 'explosion'
+			else if sq.type is 'explosion'
 				$('#map').drawRect
 					fillStyle: '#f90c22'
 					x: c_index*50+25
@@ -407,7 +407,7 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
-			else if sq_type is 'bomb'
+			else if sq.type is 'bomb'
 				$('#map').drawRect
 					fillStyle: '#0c9df9'
 					x: c_index*50+25
@@ -415,7 +415,7 @@ update_map = ->
 					width: 40
 					height: 40
 					fromCenter: true
-			else if sq_type is 'wood'
+			else if sq.type is 'wood'
 				$('#map').drawRect
 					fillStyle: '#593f00'
 					x: c_index*50+25
@@ -423,7 +423,7 @@ update_map = ->
 					width: 40
 					height: 40
 					fromCenter: true
-			else if sq_type is 'upgrade'
+			else if sq.type is 'upgrade'
 				$('#map').drawRect
 					fillStyle: '#ffad0f'
 					x: c_index*50+25
@@ -431,6 +431,12 @@ update_map = ->
 					width: 40
 					height: 40
 					fromCenter: true
+				.drawText
+					fillStyle: '#000'
+					x: c_index*50+25
+					y: r_index*50+25
+					text: sq.kind.substring(0,1)
+					font: '12pt Helvetica, sans-serif'
 	for player in players
 		$('#map').drawRect
 			fillStyle: '#fff'

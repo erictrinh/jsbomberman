@@ -418,7 +418,7 @@ walkover_logic = function(player) {
 };
 
 update_map = function() {
-  var arc_end, arc_start, c_index, column, num, overlay, player, r_index, row, sq_type, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
+  var arc_end, arc_start, c_index, column, num, overlay, player, r_index, row, sq, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
   $('#map').clearCanvas();
   template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   overlay = (function() {
@@ -455,8 +455,8 @@ update_map = function() {
     row = objects[r_index];
     for (c_index = _k = 0, _len2 = row.length; _k < _len2; c_index = ++_k) {
       column = row[c_index];
-      sq_type = objects[r_index][c_index].type;
-      if (sq_type === 'stone') {
+      sq = objects[r_index][c_index];
+      if (sq.type === 'stone') {
         $('#map').drawRect({
           fillStyle: '#777777',
           x: c_index * 50 + 25,
@@ -465,7 +465,7 @@ update_map = function() {
           height: 45,
           fromCenter: true
         });
-      } else if (sq_type === 'explosion') {
+      } else if (sq.type === 'explosion') {
         $('#map').drawRect({
           fillStyle: '#f90c22',
           x: c_index * 50 + 25,
@@ -474,7 +474,7 @@ update_map = function() {
           height: 50,
           fromCenter: true
         });
-      } else if (sq_type === 'bomb') {
+      } else if (sq.type === 'bomb') {
         $('#map').drawRect({
           fillStyle: '#0c9df9',
           x: c_index * 50 + 25,
@@ -483,7 +483,7 @@ update_map = function() {
           height: 40,
           fromCenter: true
         });
-      } else if (sq_type === 'wood') {
+      } else if (sq.type === 'wood') {
         $('#map').drawRect({
           fillStyle: '#593f00',
           x: c_index * 50 + 25,
@@ -492,7 +492,7 @@ update_map = function() {
           height: 40,
           fromCenter: true
         });
-      } else if (sq_type === 'upgrade') {
+      } else if (sq.type === 'upgrade') {
         $('#map').drawRect({
           fillStyle: '#ffad0f',
           x: c_index * 50 + 25,
@@ -500,6 +500,12 @@ update_map = function() {
           width: 40,
           height: 40,
           fromCenter: true
+        }).drawText({
+          fillStyle: '#000',
+          x: c_index * 50 + 25,
+          y: r_index * 50 + 25,
+          text: sq.kind.substring(0, 1),
+          font: '12pt Helvetica, sans-serif'
         });
       }
     }
