@@ -92,13 +92,19 @@ init_game = function() {
   var c_index, object, r_index, row, _i, _j, _len, _len1;
   game_started = true;
   explosions = [];
-  objects = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+  objects = [[5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [5, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 5], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5]];
   for (r_index = _i = 0, _len = objects.length; _i < _len; r_index = ++_i) {
     row = objects[r_index];
     for (c_index = _j = 0, _len1 = row.length; _j < _len1; c_index = ++_j) {
       object = row[c_index];
-      if (object === 0) {
+      if (object === 5) {
         objects[r_index][c_index] = new Empty();
+      } else if (object === 0) {
+        if (Math.random() < 0.7) {
+          objects[r_index][c_index] = new Wood();
+        } else {
+          objects[r_index][c_index] = new Empty();
+        }
       } else if (object === 1) {
         objects[r_index][c_index] = new Stone();
       }
@@ -381,7 +387,7 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var arc_end, arc_start, c_index, column, grid_square, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
+  var arc_end, arc_start, c_index, column, num, overlay, player, r_index, row, sq_type, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
   $('#map').clearCanvas();
   template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   overlay = (function() {
@@ -418,17 +424,17 @@ update_map = function() {
     row = objects[r_index];
     for (c_index = _k = 0, _len2 = row.length; _k < _len2; c_index = ++_k) {
       column = row[c_index];
-      grid_square = objects[r_index][c_index];
-      if (grid_square.type === 'stone') {
+      sq_type = objects[r_index][c_index].type;
+      if (sq_type === 'stone') {
         $('#map').drawRect({
           fillStyle: '#777777',
           x: c_index * 50 + 25,
           y: r_index * 50 + 25,
-          width: 50,
-          height: 50,
+          width: 45,
+          height: 45,
           fromCenter: true
         });
-      } else if (grid_square.type === 'explosion') {
+      } else if (sq_type === 'explosion') {
         $('#map').drawRect({
           fillStyle: '#f90c22',
           x: c_index * 50 + 25,
@@ -437,9 +443,18 @@ update_map = function() {
           height: 50,
           fromCenter: true
         });
-      } else if (grid_square.type === 'bomb') {
+      } else if (sq_type === 'bomb') {
         $('#map').drawRect({
           fillStyle: '#0c9df9',
+          x: c_index * 50 + 25,
+          y: r_index * 50 + 25,
+          width: 40,
+          height: 40,
+          fromCenter: true
+        });
+      } else if (sq_type === 'wood') {
+        $('#map').drawRect({
+          fillStyle: '#593f00',
           x: c_index * 50 + 25,
           y: r_index * 50 + 25,
           width: 40,
@@ -511,59 +526,71 @@ explode = function(r, c) {
 explosion_logic = function(r, c, range) {
   var countdown, temp_c, temp_r;
   set_explosion(r, c);
-  setTimeout("extinguish(" + r + "," + c + ")", 1000);
   countdown = range;
   temp_r = r - 1;
   while (countdown > 0 && temp_r >= 0 && objects[temp_r][c].walkable) {
     set_explosion(temp_r, c);
-    setTimeout("extinguish(" + temp_r + "," + c + ")", 1000);
     temp_r -= 1;
     countdown -= 1;
   }
-  if (countdown > 0 && temp_r >= 0 && objects[temp_r][c].type === 'bomb') {
-    explode(temp_r, c);
+  if (countdown > 0 && temp_r >= 0 && objects[temp_r][c].destructible) {
+    if (objects[temp_r][c].type === 'bomb') {
+      explode(temp_r, c);
+    } else if (objects[temp_r][c].type === 'wood') {
+      set_explosion(temp_r, c);
+    }
   }
   countdown = range;
   temp_r = r + 1;
   while (countdown > 0 && temp_r <= 8 && objects[temp_r][c].walkable) {
     set_explosion(temp_r, c);
-    setTimeout("extinguish(" + temp_r + "," + c + ")", 1000);
     temp_r += 1;
     countdown -= 1;
   }
-  if (countdown > 0 && temp_r <= 8 && objects[temp_r][c].type === 'bomb') {
-    explode(temp_r, c);
+  if (countdown > 0 && temp_r <= 8 && objects[temp_r][c].destructible) {
+    if (objects[temp_r][c].type === 'bomb') {
+      explode(temp_r, c);
+    } else if (objects[temp_r][c].type === 'wood') {
+      set_explosion(temp_r, c);
+    }
   }
   countdown = range;
   temp_c = c - 1;
   while (countdown > 0 && temp_c >= 0 && objects[r][temp_c].walkable) {
     set_explosion(r, temp_c);
-    setTimeout("extinguish(" + r + "," + temp_c + ")", 1000);
     temp_c -= 1;
     countdown -= 1;
   }
-  if (countdown > 0 && temp_c >= 0 && objects[r][temp_c].type === 'bomb') {
-    explode(r, temp_c);
+  if (countdown > 0 && temp_c >= 0 && objects[r][temp_c].destructible) {
+    if (objects[r][temp_c].type === 'bomb') {
+      explode(r, temp_c);
+    } else if (objects[r][temp_c].type === 'wood') {
+      set_explosion(r, temp_c);
+    }
   }
   countdown = range;
   temp_c = c + 1;
   while (countdown > 0 && temp_c <= 14 && objects[r][temp_c].walkable) {
     set_explosion(r, temp_c);
-    setTimeout("extinguish(" + r + "," + temp_c + ")", 1000);
     temp_c += 1;
     countdown -= 1;
   }
-  if (countdown > 0 && temp_c <= 14 && objects[r][temp_c].type === 'bomb') {
-    return explode(r, temp_c);
+  if (countdown > 0 && temp_c <= 14 && objects[r][temp_c].destructible) {
+    if (objects[r][temp_c].type === 'bomb') {
+      return explode(r, temp_c);
+    } else if (objects[r][temp_c].type === 'wood') {
+      return set_explosion(r, temp_c);
+    }
   }
 };
 
 set_explosion = function(r, c) {
   if (objects[r][c].type !== 'explosion') {
-    return objects[r][c] = new Explosion();
+    objects[r][c] = new Explosion();
   } else {
-    return objects[r][c].count += 1;
+    objects[r][c].count += 1;
   }
+  return setTimeout("extinguish(" + r + "," + c + ")", 1000);
 };
 
 extinguish = function(r, c) {

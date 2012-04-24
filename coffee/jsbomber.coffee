@@ -83,11 +83,18 @@ init_game = ->
 	# initialize objects as a 2d array and add stone blocks
 	# objects
 	# stone, wood, bomb, explosion, upgrade
-	objects = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+	objects = [[5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],[5,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,5],[0,0,0,0,0,0,0,0,0,0,0,0,0,5,5]]
 	for row, r_index in objects
 		for object, c_index in row
-			if object is 0
+			# object is a reserved empty space
+			if object is 5
 				objects[r_index][c_index] = new Empty()
+			else if object is 0
+				# approx. 0.7 chance of there being a wooden block
+				if Math.random() < 0.7
+					objects[r_index][c_index] = new Wood()
+				else
+					objects[r_index][c_index] = new Empty()
 			else if object is 1
 				objects[r_index][c_index] = new Stone()
 	
@@ -357,16 +364,16 @@ update_map = ->
 	# draw the things on the map, using objects array as a template
 	for row, r_index in objects
 		for column, c_index in row
-			grid_square = objects[r_index][c_index]
-			if grid_square.type is 'stone'
+			sq_type = objects[r_index][c_index].type
+			if sq_type is 'stone'
 				$('#map').drawRect
 					fillStyle: '#777777'
 					x: c_index*50+25
 					y: r_index*50+25
-					width: 50
-					height: 50
+					width: 45
+					height: 45
 					fromCenter: true
-			else if grid_square.type is 'explosion'
+			else if sq_type is 'explosion'
 				$('#map').drawRect
 					fillStyle: '#f90c22'
 					x: c_index*50+25
@@ -374,9 +381,17 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
-			else if grid_square.type is 'bomb'
+			else if sq_type is 'bomb'
 				$('#map').drawRect
 					fillStyle: '#0c9df9'
+					x: c_index*50+25
+					y: r_index*50+25
+					width: 40
+					height: 40
+					fromCenter: true
+			else if sq_type is 'wood'
+				$('#map').drawRect
+					fillStyle: '#593f00'
 					x: c_index*50+25
 					y: r_index*50+25
 					width: 40
@@ -445,63 +460,71 @@ explode = (r, c) ->
 
 # given the coordinates of the epicenter and range of explosion
 # figure out which squares will be exploded/destroyed
-# also takes care of extinguishing the explosion later
 explosion_logic = (r, c, range) ->
 	# set the epicenter grid square to an explosion square
 	set_explosion(r, c)
-	setTimeout("extinguish("+r+","+c+")",1000)
 	
 	# figure out if bomb can explode upward
 	countdown = range # range of the bomb
 	temp_r = r-1
 	while countdown > 0 && temp_r >= 0 && objects[temp_r][c].walkable
 		set_explosion(temp_r, c)
-		setTimeout("extinguish("+temp_r+","+c+")",1000)
 		temp_r -= 1
 		countdown -= 1
-	if countdown > 0 && temp_r >= 0 && objects[temp_r][c].type is 'bomb'
-		explode(temp_r, c)
+	if countdown > 0 && temp_r >= 0 && objects[temp_r][c].destructible
+		if objects[temp_r][c].type is 'bomb'
+			explode(temp_r, c)
+		else if objects[temp_r][c].type is 'wood'
+			set_explosion(temp_r, c)
 		
 	# figure out if bomb can explode downward
 	countdown = range # range of the bomb
 	temp_r = r+1
 	while countdown > 0 && temp_r <= 8 && objects[temp_r][c].walkable
 		set_explosion(temp_r, c)
-		setTimeout("extinguish("+temp_r+","+c+")",1000)
 		temp_r += 1
 		countdown -= 1
-	if countdown > 0 && temp_r <= 8 && objects[temp_r][c].type is 'bomb'
-		explode(temp_r, c)
+	if countdown > 0 && temp_r <= 8 && objects[temp_r][c].destructible
+		if objects[temp_r][c].type is 'bomb'
+			explode(temp_r, c)
+		else if objects[temp_r][c].type is 'wood'
+			set_explosion(temp_r, c)
 		
 	# figure out if bomb can explode leftward
 	countdown = range # range of the bomb
 	temp_c = c-1
 	while countdown > 0 && temp_c >= 0 && objects[r][temp_c].walkable
 		set_explosion(r, temp_c)
-		setTimeout("extinguish("+r+","+temp_c+")",1000)
 		temp_c -= 1
 		countdown -= 1
-	if countdown > 0 && temp_c >= 0 && objects[r][temp_c].type is 'bomb'
-		explode(r, temp_c)
+	if countdown > 0 && temp_c >= 0 && objects[r][temp_c].destructible
+		if objects[r][temp_c].type is 'bomb'
+			explode(r, temp_c)
+		else if objects[r][temp_c].type is 'wood'
+			set_explosion(r, temp_c)
 	
 	# figure out if bomb can explode rightward
 	countdown = range # range of the bomb
 	temp_c = c+1
 	while countdown > 0 && temp_c <= 14 && objects[r][temp_c].walkable
 		set_explosion(r, temp_c)
-		setTimeout("extinguish("+r+","+temp_c+")",1000)
 		temp_c += 1
 		countdown -= 1
-	if countdown > 0 && temp_c <= 14 && objects[r][temp_c].type is 'bomb'
-		explode(r, temp_c)
+	if countdown > 0 && temp_c <= 14 && objects[r][temp_c].destructible
+		if objects[r][temp_c].type is 'bomb'
+			explode(r, temp_c)
+		else if objects[r][temp_c].type is 'wood'
+			set_explosion(r, temp_c)
 
 # set an explosion at the coordinates
 # explosions can stack
+# extinguish these explosions later
 set_explosion = (r, c) ->
 	if objects[r][c].type isnt 'explosion'
 		objects[r][c] = new Explosion()
 	else
 		objects[r][c].count += 1
+	setTimeout("extinguish("+r+","+c+")",1000)
 		
 extinguish = (r, c) ->
 	if objects[r][c].type is 'explosion'
