@@ -416,9 +416,9 @@ walkover_logic = function(player) {
   coords = get_grid_coords(player);
   if (objects[coords.row][coords.col].type === 'upgrade') {
     kind = objects[coords.row][coords.col].kind;
-    if (kind === 'bomb_up') {
+    if (kind === 'bomb_up' && player.bomb_supply.number <= 9) {
       player.bomb_supply.number += 1;
-    } else if (kind === 'range_up') {
+    } else if (kind === 'range_up' && player.bomb_supply.range <= 9) {
       player.bomb_supply.range += 1;
     }
     return objects[coords.row][coords.col] = new Empty();
@@ -561,7 +561,7 @@ drop_bomb = function(x_pos, y_pos, pid, brange) {
   var c, r;
   c = (x_pos - 25) / 50;
   r = (y_pos - 25) / 50;
-  return objects[r][c] = new Bomb(brange, pid, setTimeout("explode(" + r + "," + c + ")", 3000));
+  return objects[r][c] = new Bomb(brange, pid, setTimeout("explode(" + r + "," + c + ")", 2500));
 };
 
 explode = function(r, c) {

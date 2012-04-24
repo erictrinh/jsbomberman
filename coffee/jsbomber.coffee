@@ -363,9 +363,9 @@ walkover_logic = (player) ->
 	# if it's an upgrade, modify the player in some way
 	if objects[coords.row][coords.col].type is 'upgrade'
 		kind = objects[coords.row][coords.col].kind
-		if kind is 'bomb_up'
+		if kind is 'bomb_up' && player.bomb_supply.number <= 9 # max number of bombs
 			player.bomb_supply.number+=1
-		else if kind is 'range_up'
+		else if kind is 'range_up'&& player.bomb_supply.range <= 9 # max range
 			player.bomb_supply.range+=1
 		
 		# delete the upgrade once you've picked it up
@@ -478,7 +478,7 @@ drop_bomb = (x_pos, y_pos, pid, brange) ->
 	# get grid coordinates of bomb
 	c = (x_pos-25)/50
 	r = (y_pos-25)/50
-	objects[r][c] = new Bomb(brange, pid, setTimeout("explode("+r+","+c+")",3000))
+	objects[r][c] = new Bomb(brange, pid, setTimeout("explode("+r+","+c+")",2500))
 
 # explode bomb at the coordinates
 explode = (r, c) ->
