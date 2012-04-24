@@ -165,6 +165,12 @@ get_grid_coords = (player) ->
 	r = (y-25)/50
 	return {row: r, col: c}
 
+# given row/col coordinates, convert to x and y
+get_cartesian = (r, c) ->
+	x = c*50+25
+	y = r*50+25
+	return {x: x, y: y}
+
 # check if player can go up, down, left, right
 # returns object literal with possible moves
 can_go = (player) ->
@@ -181,19 +187,31 @@ can_go = (player) ->
 		l = true
 	# you're on the edge now, can't let you move that way anymore, sorry
 	else if player.position.x is 25 || coords.col is 0 || !objects[coords.row][coords.col-1].walkable
-		l = false
+		if coords.col>0 && !objects[coords.row][coords.col-1].walkable && player.position.x-get_cartesian(coords.row, coords.col).x>0
+			l = true
+		else
+			l = false
 	if coords.col is 14 && player.position.x isnt 725
 		r = true
 	else if player.position.x is 725 || coords.col is 14 || !objects[coords.row][coords.col+1].walkable
-		r = false
+		if coords.col<14 && !objects[coords.row][coords.col+1].walkable && get_cartesian(coords.row, coords.col).x-player.position.x>0
+			r = true
+		else
+			r = false
 	if coords.row is 0 && player.position.y isnt 25
 		u = true
 	else if player.position.y is 25 || coords.row is 0 || !objects[coords.row-1][coords.col].walkable
-		u = false
+		if coords.row>0 && !objects[coords.row-1][coords.col].walkable && player.position.y-get_cartesian(coords.row, coords.col).y>0
+			u = true
+		else
+			u = false
 	if coords.row is 8 && player.position.y isnt 425
 		d = true
 	else if player.position.y is 425 || coords.row is 8 || !objects[coords.row+1][coords.col].walkable
-		d = false
+		if coords.col<8 && !objects[coords.row+1][coords.col].walkable && get_cartesian(coords.row, coords.col).y-player.position.y>0
+			d = true
+		else
+			d = false
 	return {up: u, down: d, left: l, right: r}
 	
 move_up = (player) ->
