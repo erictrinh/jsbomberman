@@ -126,13 +126,25 @@ can_go = (player) ->
 	l = true
 	r = true
 	# cross reference object map
-	if player.position.x is 25 || coords.col is 0 || objects[coords.row][coords.col-1] is 1
+	
+	# we're on the (left) edge of glory but haven't quite gotten there yet
+	# we'll let you get there
+	if coords.col is 0 && player.position.x isnt 25
+		l = true
+	# you're on the edge now, can't let you move that way anymore, sorry
+	else if player.position.x is 25 || coords.col is 0 || objects[coords.row][coords.col-1] is 1
 		l = false
-	if player.position.x is 725 || coords.col is 14 || objects[coords.row][coords.col+1] is 1
+	if coords.col is 14 && player.position.x isnt 725
+		r = true
+	else if player.position.x is 725 || coords.col is 14 || objects[coords.row][coords.col+1] is 1
 		r = false
-	if player.position.y is 25 || coords.row is 0 || objects[coords.row-1][coords.col] is 1
+	if coords.row is 0 && player.position.y isnt 25
+		u = true
+	else if player.position.y is 25 || coords.row is 0 || objects[coords.row-1][coords.col] is 1
 		u = false
-	if player.position.y is 425 || coords.row is 8 || objects[coords.row+1][coords.col] is 1
+	if coords.row is 8 && player.position.y isnt 425
+		d = true
+	else if player.position.y is 425 || coords.row is 8 || objects[coords.row+1][coords.col] is 1
 		d = false
 	return {up: u, down: d, left: l, right: r}
 	

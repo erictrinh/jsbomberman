@@ -149,16 +149,24 @@ can_go = function(player) {
   d = true;
   l = true;
   r = true;
-  if (player.position.x === 25 || coords.col === 0 || objects[coords.row][coords.col - 1] === 1) {
+  if (coords.col === 0 && player.position.x !== 25) {
+    l = true;
+  } else if (player.position.x === 25 || coords.col === 0 || objects[coords.row][coords.col - 1] === 1) {
     l = false;
   }
-  if (player.position.x === 725 || coords.col === 14 || objects[coords.row][coords.col + 1] === 1) {
+  if (coords.col === 14 && player.position.x !== 725) {
+    r = true;
+  } else if (player.position.x === 725 || coords.col === 14 || objects[coords.row][coords.col + 1] === 1) {
     r = false;
   }
-  if (player.position.y === 25 || coords.row === 0 || objects[coords.row - 1][coords.col] === 1) {
+  if (coords.row === 0 && player.position.y !== 25) {
+    u = true;
+  } else if (player.position.y === 25 || coords.row === 0 || objects[coords.row - 1][coords.col] === 1) {
     u = false;
   }
-  if (player.position.y === 425 || coords.row === 8 || objects[coords.row + 1][coords.col] === 1) {
+  if (coords.row === 8 && player.position.y !== 425) {
+    d = true;
+  } else if (player.position.y === 425 || coords.row === 8 || objects[coords.row + 1][coords.col] === 1) {
     d = false;
   }
   return {
