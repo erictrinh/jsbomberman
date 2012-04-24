@@ -293,7 +293,7 @@ game_logic = function() {
 };
 
 update_map = function() {
-  var arc_end, arc_start, c_index, column, elem, grid_square, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _results;
+  var arc_end, arc_start, c_index, column, elem, grid_square, num, overlay, player, r_index, row, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _results;
   $('#map').clearCanvas();
   template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   overlay = (function() {
@@ -349,27 +349,25 @@ update_map = function() {
           height: 50,
           fromCenter: true
         });
+      } else if (grid_square === 3) {
+        $('#map').drawRect({
+          fillStyle: '#0c9df9',
+          x: c_index * 50 + 25,
+          y: r_index * 50 + 25,
+          width: 40,
+          height: 40,
+          fromCenter: true
+        });
       }
     }
   }
-  for (_l = 0, _len3 = bombs.length; _l < _len3; _l++) {
-    elem = bombs[_l];
-    $('#map').drawRect({
-      fillStyle: '#0c9df9',
-      x: elem.x,
-      y: elem.y,
-      width: 40,
-      height: 40,
-      fromCenter: true
-    });
-  }
-  for (_m = 0, _len4 = explosions.length; _m < _len4; _m++) {
-    elem = explosions[_m];
+  for (_l = 0, _len3 = explosions.length; _l < _len3; _l++) {
+    elem = explosions[_l];
     draw_explosion(elem);
   }
   _results = [];
-  for (_n = 0, _len5 = players.length; _n < _len5; _n++) {
-    player = players[_n];
+  for (_m = 0, _len4 = players.length; _m < _len4; _m++) {
+    player = players[_m];
     $('#map').drawRect({
       fillStyle: '#fff',
       x: player.position.x,
@@ -407,23 +405,30 @@ update_map = function() {
 };
 
 drop_bomb = function(x_pos, y_pos, pid, brange) {
-  return bombs.push({
+  var c, r;
+  bombs.push({
     x: x_pos,
     y: y_pos,
     player_id: pid,
     range: brange,
     timer: setTimeout("explode_bomb()", 3000)
   });
+  c = (x_pos - 25) / 50;
+  r = (y_pos - 25) / 50;
+  return objects[r][c] = 3;
 };
 
 explode_bomb = function(index) {
-  var pid;
+  var c, pid, r;
   if (index == null) {
     index = 0;
   }
   clearTimeout(bombs[index].timer);
   pid = bombs[index].player_id;
   players[pid].num_bombs += 1;
+  c = (bombs[0].x - 25) / 50;
+  r = (bombs[0].y - 25) / 50;
+  objects[r][c] = 0;
   explosion(bombs[index].x, bombs[index].y, bombs[index].range);
   return bombs.splice(index, 1);
 };

@@ -291,15 +291,14 @@ update_map = ->
 					width: 50
 					height: 50
 					fromCenter: true
-			
-	for elem in bombs
-		$('#map').drawRect
-			fillStyle: '#0c9df9'
-			x: elem.x
-			y: elem.y
-			width: 40
-			height: 40
-			fromCenter: true
+			else if grid_square is 3
+				$('#map').drawRect
+					fillStyle: '#0c9df9'
+					x: c_index*50+25
+					y: r_index*50+25
+					width: 40
+					height: 40
+					fromCenter: true
 	for elem in explosions
 		draw_explosion(elem)
 	for player in players
@@ -335,12 +334,22 @@ update_map = ->
 
 drop_bomb = (x_pos, y_pos, pid, brange) ->
 	bombs.push({x: x_pos, y: y_pos, player_id: pid, range: brange, timer: setTimeout("explode_bomb()",3000)})
+	# get grid coordinates of bomb
+	c = (x_pos-25)/50
+	r = (y_pos-25)/50
+	objects[r][c] = 3
 
 explode_bomb = (index=0) ->
 	clearTimeout(bombs[index].timer)
 	# replenish bomb supply
 	pid = bombs[index].player_id
 	players[pid].num_bombs += 1
+	# remove bomb from array
+	# get grid coordinates of bomb
+	c = (bombs[0].x-25)/50
+	r = (bombs[0].y-25)/50
+	objects[r][c] = 0
+	
 	explosion(bombs[index].x, bombs[index].y, bombs[index].range)
 	bombs.splice(index,1)
 
