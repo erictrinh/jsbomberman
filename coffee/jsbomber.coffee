@@ -13,13 +13,13 @@ intro_screen = ->
 		x: center
 		y: 100
 		text: '{JSBomber}'
-		font: '60pt Helvetica, serif'
+		font: '50pt Helvetica, serif'
 	.drawText
 		fillStyle: '#000'
 		x: center
 		y: 300
 		text: "Press 'spacebar' to start"
-		font: '25pt Helvetica, serif'
+		font: '20pt Helvetica, serif'
 
 game_over_screen = (text) ->
 	center = $('#map').width()/2
@@ -97,7 +97,7 @@ init_game = ->
 	# initialize objects as a 2d array and add stone blocks
 	# objects
 	# stone, wood, bomb, explosion, upgrade
-	objects = [[5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],[5,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0,1,0,1,0,1,5],[0,0,0,0,0,0,0,0,0,0,0,0,0,5,5]]
+	objects = [[5,5,0,0,0,0,0,0,0],[5,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,0],[0,0,0,0,0,0,0,0,0],[0,1,0,1,0,1,0,1,5],[0,0,0,0,0,0,0,5,5]]
 	for row, r_index in objects
 		for object, c_index in row
 			# object is a reserved empty space
@@ -148,7 +148,7 @@ init_game = ->
 		id: 1
 		facing: 'up'
 		position:
-			x: 725
+			x: 425
 			y: 425
 		speed: 5
 		bomb_supply:
@@ -229,10 +229,10 @@ can_go = (player) ->
 			l = true
 		else
 			l = false
-	if coords.col is 14 && player.position.x isnt 725
+	if coords.col is 8 && player.position.x isnt 425
 		r = true
-	else if player.position.x is 725 || coords.col is 14 || !objects[coords.row][coords.col+1].walkable
-		if coords.col<14 && !objects[coords.row][coords.col+1].walkable && get_cartesian(coords.row, coords.col).x-player.position.x>0
+	else if player.position.x is 425 || coords.col is 8 || !objects[coords.row][coords.col+1].walkable
+		if coords.col<8 && !objects[coords.row][coords.col+1].walkable && get_cartesian(coords.row, coords.col).x-player.position.x>0
 			r = true
 		else
 			r = false
@@ -391,7 +391,7 @@ walkover_logic = (player) ->
 update_map = ->
 	$('#map').clearCanvas()
 	# draw the overlay
-	template = [1..14]
+	template = [1..8]
 	overlay = (num*50 for num in template)
 	for num in overlay
 		$('#map').drawLine
@@ -407,7 +407,7 @@ update_map = ->
 				strokeWidth: 1
 				x1: 0
 				y1: num
-				x2: 750
+				x2: 450
 				y2: num
 	num_blocks_left = 0
 	# draw the things on the map, using objects array as a template
@@ -567,11 +567,11 @@ explosion_logic = (r, c, range) ->
 	# figure out if bomb can explode rightward
 	countdown = range # range of the bomb
 	temp_c = c+1
-	while countdown > 0 && temp_c <= 14 && objects[r][temp_c].walkable
+	while countdown > 0 && temp_c <= 8 && objects[r][temp_c].walkable
 		set_explosion(r, temp_c)
 		temp_c += 1
 		countdown -= 1
-	if countdown > 0 && temp_c <= 14 && objects[r][temp_c].destructible
+	if countdown > 0 && temp_c <= 8 && objects[r][temp_c].destructible
 		if objects[r][temp_c].type is 'bomb'
 			explode(r, temp_c)
 		else if objects[r][temp_c].type is 'wood'

@@ -21,13 +21,13 @@ intro_screen = function() {
     x: center,
     y: 100,
     text: '{JSBomber}',
-    font: '60pt Helvetica, serif'
+    font: '50pt Helvetica, serif'
   }).drawText({
     fillStyle: '#000',
     x: center,
     y: 300,
     text: "Press 'spacebar' to start",
-    font: '25pt Helvetica, serif'
+    font: '20pt Helvetica, serif'
   });
 };
 
@@ -112,7 +112,7 @@ init_game = function() {
   $('#awesomeness').html('&#8734;');
   game_started = true;
   num_blocks = 0;
-  objects = [[5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [5, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 5], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5]];
+  objects = [[5, 5, 0, 0, 0, 0, 0, 0, 0], [5, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 5], [0, 0, 0, 0, 0, 0, 0, 5, 5]];
   for (r_index = _i = 0, _len = objects.length; _i < _len; r_index = ++_i) {
     row = objects[r_index];
     for (c_index = _j = 0, _len1 = row.length; _j < _len1; c_index = ++_j) {
@@ -170,7 +170,7 @@ init_game = function() {
     id: 1,
     facing: 'up',
     position: {
-      x: 725,
+      x: 425,
       y: 425
     },
     speed: 5,
@@ -263,10 +263,10 @@ can_go = function(player) {
       l = false;
     }
   }
-  if (coords.col === 14 && player.position.x !== 725) {
+  if (coords.col === 8 && player.position.x !== 425) {
     r = true;
-  } else if (player.position.x === 725 || coords.col === 14 || !objects[coords.row][coords.col + 1].walkable) {
-    if (coords.col < 14 && !objects[coords.row][coords.col + 1].walkable && get_cartesian(coords.row, coords.col).x - player.position.x > 0) {
+  } else if (player.position.x === 425 || coords.col === 8 || !objects[coords.row][coords.col + 1].walkable) {
+    if (coords.col < 8 && !objects[coords.row][coords.col + 1].walkable && get_cartesian(coords.row, coords.col).x - player.position.x > 0) {
       r = true;
     } else {
       r = false;
@@ -446,7 +446,7 @@ walkover_logic = function(player) {
 update_map = function() {
   var arc_end, arc_start, c_index, column, num, overlay, player, r_index, row, sq, template, _i, _j, _k, _l, _len, _len1, _len2, _len3, _results;
   $('#map').clearCanvas();
-  template = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  template = [1, 2, 3, 4, 5, 6, 7, 8];
   overlay = (function() {
     var _i, _len, _results;
     _results = [];
@@ -472,7 +472,7 @@ update_map = function() {
         strokeWidth: 1,
         x1: 0,
         y1: num,
-        x2: 750,
+        x2: 450,
         y2: num
       });
     }
@@ -641,12 +641,12 @@ explosion_logic = function(r, c, range) {
   }
   countdown = range;
   temp_c = c + 1;
-  while (countdown > 0 && temp_c <= 14 && objects[r][temp_c].walkable) {
+  while (countdown > 0 && temp_c <= 8 && objects[r][temp_c].walkable) {
     set_explosion(r, temp_c);
     temp_c += 1;
     countdown -= 1;
   }
-  if (countdown > 0 && temp_c <= 14 && objects[r][temp_c].destructible) {
+  if (countdown > 0 && temp_c <= 8 && objects[r][temp_c].destructible) {
     if (objects[r][temp_c].type === 'bomb') {
       return explode(r, temp_c);
     } else if (objects[r][temp_c].type === 'wood') {
