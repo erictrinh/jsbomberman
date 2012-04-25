@@ -11,13 +11,13 @@ intro_screen = ->
 		x: center
 		y: 100
 		text: '{JSBomber}'
-		font: '60pt Neuton, serif'
+		font: '60pt Helvetica, serif'
 	.drawText
 		fillStyle: '#000'
 		x: center
 		y: 300
 		text: "Press 'spacebar' to start"
-		font: '25pt Neuton, serif'
+		font: '25pt Helvetica, serif'
 
 game_over_screen = (text) ->
 	center = $('#map').width()/2
@@ -26,13 +26,13 @@ game_over_screen = (text) ->
 		x: center
 		y: 100
 		text: text
-		font: '50pt Neuton, serif'
+		font: '50pt Helvetica, serif'
 	.drawText
 		fillStyle: '#000'
 		x: center
 		y: 300
 		text: "Play again? (Spacebar)"
-		font: '25pt Neuton, serif'
+		font: '25pt Helvetica, serif'
 
 ## the following defines the types of objects that can be found on the map
 
