@@ -3,6 +3,8 @@ players = new Array()
 objects = new Array()
 timer = null
 game_started = false
+num_blocks = null
+num_blocks_left = null
 
 intro_screen = ->
 	center = $('#map').width()/2
@@ -85,10 +87,13 @@ Upgrade = (k) ->
 # initialize the game with 2 players
 init_game = ->
 	$('#stats').css('color', 'black')
-	$('#numbombs').text(1)
-	$('#rangebombs').text(1)
+	$('#numbombs1').text(1)
+	$('#numbombs2').text(1)
+	$('#rangebombs1').text(1)
+	$('#rangebombs2').text(1)
 	$('#awesomeness').html('&#8734;')
 	game_started = true
+	num_blocks = 0
 	# initialize objects as a 2d array and add stone blocks
 	# objects
 	# stone, wood, bomb, explosion, upgrade
@@ -101,6 +106,7 @@ init_game = ->
 			else if object is 0
 				# approx. 0.7 chance of there being a wooden block
 				if Math.random() < 0.7
+					num_blocks += 1
 					# 0.3 chance of wooden block containing upgrade
 					if Math.random() < 0.3
 						# 0.5 chance of either bomb up or range up upgrade
@@ -116,6 +122,7 @@ init_game = ->
 				objects[r_index][c_index] = new Stone()
 	
 	players[0] = 
+		id: 0
 		position:
 			x: 25
 			y: 25
@@ -138,6 +145,7 @@ init_game = ->
 		drop: false
 		dead: false
 	players[1] = 
+		id: 1
 		facing: 'up'
 		position:
 			x: 725
@@ -359,7 +367,7 @@ game_logic = ->
 		clearTimeout(timer)
 		game_started = false
 	else
-		timer=setTimeout("game_logic()",25)
+		timer=setTimeout("game_logic()",Math.round(10+15*(num_blocks_left/num_blocks)))
 
 # determines the logic of walked over items and terrain
 # mainly upgrade behavior
@@ -371,10 +379,10 @@ walkover_logic = (player) ->
 		if kind is 'bomb_up' && player.bomb_supply.max_number < 10 # max number of bombs
 			player.bomb_supply.max_number+=1
 			player.bomb_supply.number+=1
-			$('#numbombs').text(player.bomb_supply.max_number)
+			$('#numbombs'+(player.id+1)).text(player.bomb_supply.max_number)
 		else if kind is 'range_up'&& player.bomb_supply.range < 10 # max range
 			player.bomb_supply.range+=1
-			$('#rangebombs').text(player.bomb_supply.range)
+			$('#rangebombs'+(player.id+1)).text(player.bomb_supply.range)
 		
 		# delete the upgrade once you've picked it up
 		objects[coords.row][coords.col] = new Empty()
@@ -401,6 +409,7 @@ update_map = ->
 				y1: num
 				x2: 750
 				y2: num
+	num_blocks_left = 0
 	# draw the things on the map, using objects array as a template
 	for row, r_index in objects
 		for column, c_index in row
@@ -430,6 +439,7 @@ update_map = ->
 					height: 40
 					fromCenter: true
 			else if sq.type is 'wood'
+				num_blocks_left += 1
 				$('#map').drawRect
 					fillStyle: '#593f00'
 					x: c_index*50+25
