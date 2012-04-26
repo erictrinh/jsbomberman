@@ -15,3 +15,8 @@ Player 2 controls:
 
 	movement: PL;' (semicolon and single quote)
 	drop a bomb: / (forward slash)
+
+GREY blocks are indestructible blocks
+BROWN blocks are destructible blocks, which when destroyed may drop ORANGE blocks (upgrades)
+ORANGE blocks are labeled with 'b' (increases player's max number of bombs that can be dropped) or 'r' (increases range of player's bombs)
+BLUE blocks are bombs that explode within a certain time interval (read: get out of the way!)
