@@ -4,20 +4,33 @@
     	<title>JSBomber</title>
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     	<script src="js/jcanvas.min.js"></script>
-    	<script src="js/jsbomber.js"></script>
+    	<link href="styles/main.css" rel='stylesheet' type='text/css'>
     	<link href='http://fonts.googleapis.com/css?family=Neuton:400,200' rel='stylesheet' type='text/css'>
+    	<script src="js/objtypes.js"></script>
+    	<script src="js/playerlocation.js"></script>
+    	<script src="js/playermovement.js"></script>
+    	<script src="js/render.js"></script>
+    	<script src="js/screens.js"></script>
+    	<script src="js/main.js"></script>
     </head>
     
     <body>
-    	<div style="width: 450px; margin: 0 auto; font-family: Neuton; font-size: 20px;">
-    		<div id="stats" style="color: #b7b7b7;">
-    			<div style="width: 300px; display: inline-block; float: left;">Bombs: <span id="numbombs1">0</span> | Range: <span id="rangebombs1">0</span> | Awesomeness: <span id="awesomeness">0</span></div>
-    			<div style="width: 300px; display: inline-block; float: right;">Bombs: <span id="numbombs2">0</span> | Range: <span id="rangebombs2">0</span> | Awesomeness: <span>0</span></div>
-    		</div>
-	        <canvas id="map" width="450" height="450" style="position: relative; border: 1px solid #333;">
+    	<div id="container">
+	    	
+    		<canvas id="map" width="450" height="450">
+    		</canvas>
+    		
+    		<canvas id="overlay" width="450" height="450">
+    		</canvas>
+    		
+    		<canvas id="bomb" width="450" height="450">
+    		</canvas>
+    		
+	        <canvas id="player" width="450" height="450">
 	        </canvas>
 	        
-	        <p>For the best gaming experience, open <a href="http://www.youtube.com/watch?v=-Bs1NBiR3t0" target="_blank">this link</a> in another tab, then play this game.</p>
         </div>
+        
+        <p>For the best gaming experience, open <a href="http://www.youtube.com/watch?v=-Bs1NBiR3t0" target="_blank">this link</a> in another tab, then play this game.</p>
     </body>
 </html>

@@ -1,0 +1,27 @@
+body {
+	font-family: Neuton;
+	font-size: 20px;
+}
+
+div#container {
+	width: 450px;
+	height: 450px;
+	margin: 0 auto;
+	border: 1px solid #333;
+}
+
+canvas#map {
+	position: absolute;
+}
+
+canvas#overlay {
+	position: absolute;
+}
+
+canvas#player {
+	position: absolute;
+}
+
+canvas#bomb {
+	position: absolute;
+}
