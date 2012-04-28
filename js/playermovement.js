@@ -222,5 +222,5 @@ movement_logic = function(player) {
       }
     }
   }
-  return setTimeout("movement_logic(players[" + player.id + "])", rate);
+  return player.movement = setTimeout("movement_logic(players[" + player.id + "])", rate);
 };

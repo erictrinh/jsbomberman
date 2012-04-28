@@ -33,7 +33,8 @@ Player = function(pid, pos_x, pos_y, cont_up, cont_down, cont_left, cont_right, 
   this.down = false;
   this.right = false;
   this.left = false;
-  return this.dead = false;
+  this.dead = false;
+  return this.movement = movement_logic(this);
 };
 
 init_game = function() {
@@ -80,7 +81,7 @@ init_game = function() {
 };
 
 game_logic = function() {
-  var player, _i, _len;
+  var player, _i, _j, _len, _len1;
   for (_i = 0, _len = players.length; _i < _len; _i++) {
     player = players[_i];
     walkover_logic(player);
@@ -88,6 +89,10 @@ game_logic = function() {
   draw_player();
   if (check_collisions()) {
     clearTimeout(timer);
+    for (_j = 0, _len1 = players.length; _j < _len1; _j++) {
+      player = players[_j];
+      clearTimeout(player.movement);
+    }
     return game_started = false;
   } else {
     return timer = setTimeout("game_logic()", 30);
@@ -266,7 +271,7 @@ $(function() {
 });
 
 $(document).bind('keydown', function(e) {
-  var coords, player, player_id, _i, _j, _len, _len1;
+  var coords, player, player_id, _i, _len;
   if (!event.metaKey) {
     if (!game_started) {
       if (e.which === 32) {
@@ -276,14 +281,10 @@ $(document).bind('keydown', function(e) {
         $('#player').clearCanvas();
         init_game();
         init_draw();
-        for (_i = 0, _len = players.length; _i < _len; _i++) {
-          player = players[_i];
-          movement_logic(player);
-        }
         game_logic();
       }
     }
-    for (player_id = _j = 0, _len1 = players.length; _j < _len1; player_id = ++_j) {
+    for (player_id = _i = 0, _len = players.length; _i < _len; player_id = ++_i) {
       player = players[player_id];
       if (e.which === player.controls.up) {
         player.up = true;

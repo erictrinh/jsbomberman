@@ -193,4 +193,4 @@ movement_logic = (player) ->
 			else
 				player.facing = 'right'
 				
-	setTimeout("movement_logic(players[#{player.id}])", rate)
+	player.movement = setTimeout("movement_logic(players[#{player.id}])", rate)

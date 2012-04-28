@@ -16,6 +16,7 @@ Player = (pid, pos_x, pos_y, cont_up, cont_down, cont_left, cont_right, cont_dro
 	this.right = false
 	this.left = false
 	this.dead = false
+	this.movement = movement_logic(this)
 
 # initialize the game with 2 players
 init_game = ->
@@ -66,6 +67,8 @@ game_logic = ->
 	if check_collisions()
 		# game over
 		clearTimeout(timer)
+		for player in players
+			clearTimeout(player.movement)
 		game_started = false
 	else
 		timer=setTimeout("game_logic()",30)
@@ -254,8 +257,6 @@ $(document).bind 'keydown', (e) ->
 				$('#player').clearCanvas()
 				init_game()
 				init_draw()
-				for player in players
-					movement_logic(player)
 				game_logic()
 		for player, player_id in players
 			if e.which is player.controls.up
