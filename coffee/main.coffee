@@ -119,7 +119,7 @@ walkover_logic = (player) ->
 		update_map(coords.row, coords.col)
 
 drop_bomb = (r, c, pid, brange) ->
-	objects[r][c] = new Bomb(brange, pid, setTimeout("explode("+r+","+c+")",2500))
+	objects[r][c] = new Bomb(brange, pid, setTimeout("explode(#{r},#{c})",2500))
 	update_bomb(r, c)
 
 # explode bomb at the coordinates
@@ -221,7 +221,7 @@ set_explosion = (r, c) ->
 		
 	
 	# extinguish those explosions later
-	setTimeout("extinguish("+r+","+c+")",1000)
+	setTimeout("extinguish(#{r},#{c})",1000)
 
 extinguish = (r, c) ->
 	if objects[r][c].type is 'explosion'
