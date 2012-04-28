@@ -4,6 +4,18 @@ objects = new Array()
 timer = null
 game_started = false
 
+Player = (pid, pos_x, pos_y, cont_up, cont_down, cont_left, cont_right, cont_drop) ->
+	this.id = pid
+	this.position = {x: pos_x, y: pos_y}
+	this.facing = 'down'
+	this.speed = 1
+	this.bomb_supply = {max_number: 1, number: 1, range: 1}
+	this.controls = {up: cont_up, down: cont_down, left: cont_left, right: cont_right, drop: cont_drop}
+	this.up = false
+	this.down = false
+	this.right = false
+	this.left = false
+	this.dead = false
 
 # initialize the game with 2 players
 init_game = ->
@@ -27,12 +39,15 @@ init_game = ->
 				# approx. 0.7 chance of there being a wooden block
 				if Math.random() < 0.7
 					# 0.3 chance of wooden block containing upgrade
-					if Math.random() < 0.3
+					if Math.random() < 1
 						# 0.5 chance of either bomb up or range up upgrade
-						if Math.random() < 0.5
+						if Math.random() < 0.33
 							objects[r_index][c_index] = new Wood('range_up')
 						else
-							objects[r_index][c_index] = new Wood('bomb_up')
+							if Math.random() < 0.5
+								objects[r_index][c_index] = new Wood('speed_up')
+							else
+								objects[r_index][c_index] = new Wood('bomb_up')
 					else
 						objects[r_index][c_index] = new Wood()
 				else
@@ -40,56 +55,12 @@ init_game = ->
 			else if object is 1
 				objects[r_index][c_index] = new Stone()
 	
-	players[0] = 
-		id: 0
-		position:
-			x: 25
-			y: 25
-		facing: 'down'
-		speed: 5
-		bomb_supply:
-			max_number: 1
-			number: 1
-			range: 1
-		controls:
-			up: 87
-			down: 83
-			left: 65
-			right: 68
-			drop: 88
-		up: false
-		down: false
-		right: false
-		left: false
-		drop: false
-		dead: false
-	players[1] = 
-		id: 1
-		facing: 'up'
-		position:
-			x: 425
-			y: 425
-		speed: 5
-		bomb_supply:
-			max_number: 1
-			number: 1
-			range: 1
-		controls:
-			up: 80
-			down: 186
-			left: 76
-			right: 222
-			drop: 191
-		up: false
-		down: false
-		right: false
-		left: false
-		drop: false
-		dead: false
+	
+	players[0] = new Player(0, 25, 25, 87, 83, 65, 68, 88)
+	players[1] = new Player(1, 425, 425, 80, 186, 76, 222, 191)
 
 game_logic = ->
 	for player in players
-		movement_logic(player)
 		walkover_logic(player)
 	draw_player()
 	if check_collisions()
@@ -97,7 +68,7 @@ game_logic = ->
 		clearTimeout(timer)
 		game_started = false
 	else
-		timer=setTimeout("game_logic()",25)
+		timer=setTimeout("game_logic()",30)
 
 # determines the logic of walked over items and terrain
 # mainly upgrade behavior
@@ -113,6 +84,10 @@ walkover_logic = (player) ->
 		else if kind is 'range_up'&& player.bomb_supply.range < 10 # max range
 			player.bomb_supply.range+=1
 			$('#rangebombs'+(player.id+1)).text(player.bomb_supply.range)
+		else if kind is 'speed_up'&& player.bomb_supply.range < 10 # max speed
+			player.speed+=1
+			# make sure x and y position are odd
+			console.log player.position.x, player.position.y
 		
 		# delete the upgrade once you've picked it up
 		objects[coords.row][coords.col] = new Empty()
@@ -273,8 +248,14 @@ $(document).bind 'keydown', (e) ->
 	unless event.metaKey
 		unless game_started
 			if e.which is 32 # this is the spacebar
+				$('#overlay').clearCanvas()
+				$('#map').clearCanvas()
+				$('#bomb').clearCanvas()
+				$('#player').clearCanvas()
 				init_game()
 				init_draw()
+				for player in players
+					movement_logic(player)
 				game_logic()
 		for player, player_id in players
 			if e.which is player.controls.up

@@ -40,21 +40,66 @@ can_go = (player) ->
 		else
 			d = false
 	return {up: u, down: d, left: l, right: r}
-	
-move_up = (player) ->
+
+is_odd = (num) ->
+	return num%2 is 1
+
+move_up = (player, unit) ->
 	player.facing = 'up'
-	player.position.y -= player.speed
-move_down = (player) ->
+	player.position.y -= unit
+	if !is_odd(player.position.y) && unit is 2
+		player.position.y -=1
+move_down = (player, unit) ->
 	player.facing = 'down'
-	player.position.y += player.speed
-move_left = (player) ->
+	player.position.y += unit
+	if !is_odd(player.position.y) && unit is 2
+		player.position.y +=1
+move_left = (player, unit) ->
 	player.facing = 'left'
-	player.position.x -= player.speed
-move_right = (player) ->
+	player.position.x -= unit
+	if !is_odd(player.position.x) && unit is 2
+		player.position.x -=1
+move_right = (player, unit) ->
 	player.facing = 'right'
-	player.position.x += player.speed
+	player.position.x += unit
+	if !is_odd(player.position.x) && unit is 2
+		player.position.x +=1
 
 movement_logic = (player) ->
+	unit = null
+	rate = null
+	switch player.speed
+		when 1
+			unit = 1
+			rate = 10
+		when 2
+			unit = 1
+			rate = 7
+		when 3
+			unit = 2
+			rate = 10
+		when 4
+			unit = 2
+			rate = 8
+		when 5
+			unit = 2
+			rate = 6
+		when 6
+			unit = 2
+			rate = 5
+		when 7
+			unit = 1
+			rate = 2
+		when 8
+			unit = 2
+			rate = 3
+		when 9
+			unit = 2
+			rate = 2
+		when 10
+			unit = 2
+			rate = 1
+
 	# player is holding down the up key
 	if player.up
 		# not on a snap axis
@@ -62,19 +107,19 @@ movement_logic = (player) ->
 			# if no obstacle there, move towards the snap coordinate
 			if can_go(player).up
 				if on_snap_x(player) > player.position.x
-					move_right(player)
+					move_right(player, unit)
 				else
-					move_left(player)
+					move_left(player, unit)
 			# otherwise, move in the opposite direction
 			else
 				if on_snap_x(player) > player.position.x
-					move_left(player)
+					move_left(player, unit)
 				else
-					move_right(player)
+					move_right(player, unit)
 		# this is on a snap axis, so move normally IF no obstacle there
 		else
 			if can_go(player).up
-				move_up(player)
+				move_up(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'up'
@@ -85,19 +130,19 @@ movement_logic = (player) ->
 			# if no obstacle there, move towards the snap coordinate
 			if can_go(player).down
 				if on_snap_x(player) > player.position.x
-					move_right(player)
+					move_right(player, unit)
 				else
-					move_left(player)
+					move_left(player, unit)
 			# otherwise, move in the opposite direction
 			else
 				if on_snap_x(player) > player.position.x
-					move_left(player)
+					move_left(player, unit)
 				else
-					move_right(player)
+					move_right(player, unit)
 		# this is on a snap axis, so move normally
 		else
 			if can_go(player).down
-				move_down(player)
+				move_down(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'down'
@@ -108,19 +153,19 @@ movement_logic = (player) ->
 			# if no obstacle there, move towards the snap coordinate
 			if can_go(player).left
 				if on_snap_y(player) > player.position.y
-					move_down(player)
+					move_down(player, unit)
 				else
-					move_up(player)
+					move_up(player, unit)
 			# otherwise, move in the opposite direction
 			else
 				if on_snap_y(player) > player.position.y
-					move_up(player)
+					move_up(player, unit)
 				else
-					move_down(player)
+					move_down(player, unit)
 		# this is on a snap axis, so move normally
 		else
 			if can_go(player).left
-				move_left(player)
+				move_left(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'left'
@@ -131,19 +176,21 @@ movement_logic = (player) ->
 			# if no obstacle there, move towards the snap coordinate
 			if can_go(player).right
 				if on_snap_y(player) > player.position.y
-					move_down(player)
+					move_down(player, unit)
 				else
-					move_up(player)
+					move_up(player, unit)
 			# otherwise, move in the opposite direction
 			else
 				if on_snap_y(player) > player.position.y
-					move_up(player)
+					move_up(player, unit)
 				else
-					move_down(player)
+					move_down(player, unit)
 		# this is on a snap axis, so move normally
 		else
 			if can_go(player).right
-				move_right(player)
+				move_right(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'right'
+				
+	setTimeout("movement_logic(players[#{player.id}])", rate)

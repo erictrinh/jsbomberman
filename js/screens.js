@@ -22,7 +22,7 @@ intro_screen = function() {
 game_over_screen = function(text) {
   var center;
   center = $('#map').width() / 2;
-  return $('#map').drawText({
+  return $('#overlay').drawText({
     fillStyle: '#000',
     x: center,
     y: 100,

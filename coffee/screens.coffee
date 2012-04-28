@@ -15,7 +15,7 @@ intro_screen = ->
 
 game_over_screen = (text) ->
 	center = $('#map').width()/2
-	$('#map').drawText
+	$('#overlay').drawText
 		fillStyle: '#000'
 		x: center
 		y: 100
