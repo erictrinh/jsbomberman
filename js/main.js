@@ -108,7 +108,6 @@ game_logic = function() {
     walkover_logic(player);
   }
   draw_player();
-  draw_bomb();
   if (check_collisions()) {
     clearTimeout(timer);
     return game_started = false;
@@ -136,7 +135,8 @@ walkover_logic = function(player) {
 };
 
 drop_bomb = function(r, c, pid, brange) {
-  return objects[r][c] = new Bomb(brange, pid, setTimeout("explode(" + r + "," + c + ")", 2500));
+  objects[r][c] = new Bomb(brange, pid, setTimeout("explode(" + r + "," + c + ")", 2500));
+  return update_bomb(r, c);
 };
 
 explode = function(r, c) {
@@ -154,6 +154,7 @@ explode = function(r, c) {
 explosion_logic = function(r, c, range) {
   var countdown, temp_c, temp_r;
   set_explosion(r, c);
+  update_bomb(r, c);
   countdown = range;
   temp_r = r - 1;
   while (countdown > 0 && temp_r >= 0 && objects[temp_r][c].walkable) {
@@ -222,6 +223,7 @@ set_explosion = function(r, c) {
       setTimeout("set_upgrade(" + r + "," + c + ",'" + objects[r][c].kind + "')", 1000);
     }
     objects[r][c] = new Explosion();
+    update_bomb(r, c);
   }
   return setTimeout("extinguish(" + r + "," + c + ")", 1000);
 };
@@ -230,7 +232,8 @@ extinguish = function(r, c) {
   if (objects[r][c].type === 'explosion') {
     if (objects[r][c].count === 1) {
       objects[r][c] = new Empty();
-      return update_map(r, c);
+      update_map(r, c);
+      return update_bomb(r, c);
     } else {
       return objects[r][c].count -= 1;
     }
@@ -239,7 +242,8 @@ extinguish = function(r, c) {
 
 set_upgrade = function(r, c, kind) {
   objects[r][c] = new Upgrade(kind);
-  return update_map(r, c);
+  update_map(r, c);
+  return update_bomb(r, c);
 };
 
 check_collisions = function() {

@@ -92,7 +92,6 @@ game_logic = ->
 		movement_logic(player)
 		walkover_logic(player)
 	draw_player()
-	draw_bomb()
 	if check_collisions()
 		# game over
 		clearTimeout(timer)
@@ -121,6 +120,7 @@ walkover_logic = (player) ->
 
 drop_bomb = (r, c, pid, brange) ->
 	objects[r][c] = new Bomb(brange, pid, setTimeout("explode("+r+","+c+")",2500))
+	update_bomb(r, c)
 
 # explode bomb at the coordinates
 explode = (r, c) ->
@@ -148,6 +148,7 @@ explode = (r, c) ->
 explosion_logic = (r, c, range) ->
 	# set the epicenter grid square to an explosion square
 	set_explosion(r, c)
+	update_bomb(r, c)
 	
 	# figure out if bomb can explode upward
 	countdown = range # range of the bomb
@@ -216,6 +217,7 @@ set_explosion = (r, c) ->
 		else if objects[r][c].type is 'upgrade'
 			setTimeout("set_upgrade("+r+","+c+",'"+objects[r][c].kind+"')",1000)
 		objects[r][c] = new Explosion()
+		update_bomb(r, c)
 		
 	
 	# extinguish those explosions later
@@ -226,6 +228,7 @@ extinguish = (r, c) ->
 		if objects[r][c].count is 1
 			objects[r][c] = new Empty()
 			update_map(r, c)
+			update_bomb(r, c)
 		else
 			objects[r][c].count -= 1
 
@@ -233,6 +236,7 @@ extinguish = (r, c) ->
 set_upgrade = (r, c, kind) ->
 	objects[r][c] = new Upgrade(kind)
 	update_map(r, c)
+	update_bomb(r, c)
 
 # check if any of the explosions hit the players
 check_collisions = ->

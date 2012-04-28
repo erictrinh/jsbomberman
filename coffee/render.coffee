@@ -56,46 +56,47 @@ draw_player = ->
 		  radius: 18
 		  start: arc_start
 		  end: arc_end
+
+# clear a square of the grid for a redraw, returns the cartesian coordinates
+clear_square = ($layer, r, c) ->
+	cartesian = get_cartesian(r, c)
+	$layer.clearCanvas
+		x: cartesian.x
+		y: cartesian.y
+		width: 50
+		height: 50
+	return {x: cartesian.x, y: cartesian.y}
 		  
-# draw the bomb layer
-draw_bomb = ->
-	$('#bomb').clearCanvas()
-	for row, r_index in objects
-		for column, c_index in row
-			sq = objects[r_index][c_index]
-			if sq.type is 'explosion'
-				$('#bomb').drawRect
-					fillStyle: '#f90c22'
-					x: c_index*50+25
-					y: r_index*50+25
-					width: 50
-					height: 50
-					fromCenter: true
-			else if sq.type is 'bomb'
-				$('#bomb').drawRect
-					fillStyle: '#0c9df9'
-					x: c_index*50+25
-					y: r_index*50+25
-					width: 40
-					height: 40
-					fromCenter: true
+# update a section of the bomb layer
+update_bomb = (r, c)->
+	cartesian = clear_square($('#bomb'),r, c)
+	sq = objects[r][c]
+	if sq.type is 'explosion'
+		$('#bomb').drawRect
+			fillStyle: '#f90c22'
+			x: cartesian.x
+			y: cartesian.y
+			width: 50
+			height: 50
+			fromCenter: true
+	else if sq.type is 'bomb'
+		$('#bomb').drawRect
+			fillStyle: '#0c9df9'
+			x: cartesian.x
+			y: cartesian.y
+			width: 40
+			height: 40
+			fromCenter: true
 
 # update a section of the map
 update_map = (r, c) ->
-	cartesian = get_cartesian(r, c)
-	x = cartesian.x
-	y = cartesian.y
-	$('#map').clearCanvas
-		x: x
-		y: y
-		width: 50
-		height: 50
+	cartesian = clear_square($('#map'),r, c)
 	sq = objects[r][c]
 	if sq.type is 'stone'
 		$('#map').drawRect
 			fillStyle: '#777777'
-			x: x
-			y: y
+			x: cartesian.x
+			y: cartesian.y
 			width: 45
 			height: 45
 			fromCenter: true
@@ -103,23 +104,23 @@ update_map = (r, c) ->
 	else if sq.type is 'wood'
 		$('#map').drawRect
 			fillStyle: '#593f00'
-			x: x
-			y: y
-			width: 40
-			height: 40
+			x: cartesian.x
+			y: cartesian.y
+			width: 45
+			height: 45
 			fromCenter: true
 			cornerRadius: 10
 	else if sq.type is 'upgrade'
 		$('#map').drawRect
 			fillStyle: '#ffad0f'
-			x: x
-			y: y
+			x: cartesian.x
+			y: cartesian.y
 			width: 40
 			height: 40
 			fromCenter: true
 		.drawText
 			fillStyle: '#000'
-			x: x
-			y: y
+			x: cartesian.x
+			y: cartesian.y
 			text: sq.kind.substring(0,1)
 			font: '12pt Helvetica, sans-serif'
