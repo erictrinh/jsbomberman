@@ -1,45 +1,58 @@
-# check if player can go up, down, left, right
-# returns object literal with possible moves
-can_go = (player) ->
+can_go_right = (player) ->
 	coords = get_grid_coords(player)
-	u = true
-	d = true
-	l = true
-	r = true
-	# cross reference object map
 	
-	# we're on the (left) edge of glory but haven't quite gotten there yet
-	# we'll let you get there
-	if coords.col is 0 && player.position.x isnt 25
-		l = true
-	# you're on the edge now, can't let you move that way anymore, sorry
-	else if player.position.x is 25 || coords.col is 0 || !objects[coords.row][coords.col-1].walkable
-		if coords.col>0 && !objects[coords.row][coords.col-1].walkable && player.position.x-get_cartesian(coords.row, coords.col).x>0
-			l = true
-		else
-			l = false
-	if coords.col is 8 && player.position.x isnt 425
-		r = true
-	else if player.position.x is 425 || coords.col is 8 || !objects[coords.row][coords.col+1].walkable
-		if coords.col<8 && !objects[coords.row][coords.col+1].walkable && get_cartesian(coords.row, coords.col).x-player.position.x>0
-			r = true
-		else
-			r = false
-	if coords.row is 0 && player.position.y isnt 25
-		u = true
-	else if player.position.y is 25 || coords.row is 0 || !objects[coords.row-1][coords.col].walkable
-		if coords.row>0 && !objects[coords.row-1][coords.col].walkable && player.position.y-get_cartesian(coords.row, coords.col).y>0
-			u = true
-		else
-			u = false
-	if coords.row is 8 && player.position.y isnt 425
-		d = true
-	else if player.position.y is 425 || coords.row is 8 || !objects[coords.row+1][coords.col].walkable
-		if coords.row<8 && !objects[coords.row+1][coords.col].walkable && get_cartesian(coords.row, coords.col).y-player.position.y>0
-			d = true
-		else
-			d = false
-	return {up: u, down: d, left: l, right: r}
+	if player.position.x is 425
+		return false
+	else if coords.col is 8
+		return true
+	if objects[coords.row][coords.col+1].walkable
+		return true
+	else if player.position.x isnt on_snap_x(player)
+		return true
+	else
+		return false
+
+can_go_left = (player) ->
+	coords = get_grid_coords(player)
+	
+	if player.position.x is 25
+		return false
+	else if coords.col is 0
+		return true
+	if objects[coords.row][coords.col-1].walkable
+		return true
+	else if player.position.x isnt on_snap_x(player)
+		return true
+	else
+		return false
+		
+can_go_down = (player) ->
+	coords = get_grid_coords(player)
+	
+	if player.position.y is 425
+		return false
+	else if coords.row is 8
+		return true
+	if objects[coords.row+1][coords.col].walkable
+		return true
+	else if player.position.y isnt on_snap_y(player)
+		return true
+	else
+		return false
+		
+can_go_up = (player) ->
+	coords = get_grid_coords(player)
+	
+	if player.position.y is 25
+		return false
+	else if coords.row is 0
+		return true
+	if objects[coords.row-1][coords.col].walkable
+		return true
+	else if player.position.y isnt on_snap_y(player)
+		return true
+	else
+		return false
 
 is_odd = (num) ->
 	return num%2 is 1
@@ -105,7 +118,7 @@ movement_logic = (player) ->
 		# not on a snap axis
 		if on_snap_x(player) isnt player.position.x
 			# if no obstacle there, move towards the snap coordinate
-			if can_go(player).up
+			if can_go_up(player)
 				if on_snap_x(player) > player.position.x
 					move_right(player, unit)
 				else
@@ -118,7 +131,7 @@ movement_logic = (player) ->
 					move_right(player, unit)
 		# this is on a snap axis, so move normally IF no obstacle there
 		else
-			if can_go(player).up
+			if can_go_up(player)
 				move_up(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
@@ -128,7 +141,7 @@ movement_logic = (player) ->
 		# not on a snap axis
 		if on_snap_x(player) isnt player.position.x
 			# if no obstacle there, move towards the snap coordinate
-			if can_go(player).down
+			if can_go_down(player)
 				if on_snap_x(player) > player.position.x
 					move_right(player, unit)
 				else
@@ -141,7 +154,7 @@ movement_logic = (player) ->
 					move_right(player, unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go(player).down
+			if can_go_down(player)
 				move_down(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
@@ -151,7 +164,7 @@ movement_logic = (player) ->
 		# not on a snap axis
 		if on_snap_y(player) isnt player.position.y
 			# if no obstacle there, move towards the snap coordinate
-			if can_go(player).left
+			if can_go_left(player)
 				if on_snap_y(player) > player.position.y
 					move_down(player, unit)
 				else
@@ -164,7 +177,7 @@ movement_logic = (player) ->
 					move_down(player, unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go(player).left
+			if can_go_left(player)
 				move_left(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
@@ -174,7 +187,7 @@ movement_logic = (player) ->
 		# not on a snap axis
 		if on_snap_y(player) isnt player.position.y
 			# if no obstacle there, move towards the snap coordinate
-			if can_go(player).right
+			if can_go_right(player)
 				if on_snap_y(player) > player.position.y
 					move_down(player, unit)
 				else
@@ -187,7 +200,7 @@ movement_logic = (player) ->
 					move_down(player, unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go(player).right
+			if can_go_right(player)
 				move_right(player, unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else

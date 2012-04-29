@@ -40,7 +40,7 @@ init_game = ->
 				# approx. 0.7 chance of there being a wooden block
 				if Math.random() < 0.7
 					# 0.3 chance of wooden block containing upgrade
-					if Math.random() < 1
+					if Math.random() < 0.3
 						# 0.5 chance of either bomb up or range up upgrade
 						if Math.random() < 0.33
 							objects[r_index][c_index] = new Wood('range_up')

@@ -55,7 +55,7 @@ init_game = function() {
         objects[r_index][c_index] = new Empty();
       } else if (object === 0) {
         if (Math.random() < 0.7) {
-          if (Math.random() < 1) {
+          if (Math.random() < 0.3) {
             if (Math.random() < 0.33) {
               objects[r_index][c_index] = new Wood('range_up');
             } else {
