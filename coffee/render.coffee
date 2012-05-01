@@ -57,6 +57,12 @@ draw_player = ->
 		  start: arc_start
 		  end: arc_end
 
+# given row/col coordinates, convert to x and y
+get_cartesian = (r, c) ->
+	x = c*50+25
+	y = r*50+25
+	return {x: x, y: y}
+
 # clear a square of the grid for a redraw, returns the cartesian coordinates
 clear_square = ($layer, r, c) ->
 	cartesian = get_cartesian(r, c)

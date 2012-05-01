@@ -1,82 +1,5 @@
-can_go_right = (player) ->
-	coords = get_grid_coords(player)
-	
-	if player.position.x is 425
-		return false
-	else if coords.col is 8
-		return true
-	if objects[coords.row][coords.col+1].walkable
-		return true
-	else if player.position.x isnt on_snap_x(player)
-		return true
-	else
-		return false
-
-can_go_left = (player) ->
-	coords = get_grid_coords(player)
-	
-	if player.position.x is 25
-		return false
-	else if coords.col is 0
-		return true
-	if objects[coords.row][coords.col-1].walkable
-		return true
-	else if player.position.x isnt on_snap_x(player)
-		return true
-	else
-		return false
-		
-can_go_down = (player) ->
-	coords = get_grid_coords(player)
-	
-	if player.position.y is 425
-		return false
-	else if coords.row is 8
-		return true
-	if objects[coords.row+1][coords.col].walkable
-		return true
-	else if player.position.y isnt on_snap_y(player)
-		return true
-	else
-		return false
-		
-can_go_up = (player) ->
-	coords = get_grid_coords(player)
-	
-	if player.position.y is 25
-		return false
-	else if coords.row is 0
-		return true
-	if objects[coords.row-1][coords.col].walkable
-		return true
-	else if player.position.y isnt on_snap_y(player)
-		return true
-	else
-		return false
-
 is_odd = (num) ->
 	return num%2 is 1
-
-move_up = (player, unit) ->
-	player.facing = 'up'
-	player.position.y -= unit
-	if !is_odd(player.position.y) && unit is 2
-		player.position.y -=1
-move_down = (player, unit) ->
-	player.facing = 'down'
-	player.position.y += unit
-	if !is_odd(player.position.y) && unit is 2
-		player.position.y +=1
-move_left = (player, unit) ->
-	player.facing = 'left'
-	player.position.x -= unit
-	if !is_odd(player.position.x) && unit is 2
-		player.position.x -=1
-move_right = (player, unit) ->
-	player.facing = 'right'
-	player.position.x += unit
-	if !is_odd(player.position.x) && unit is 2
-		player.position.x +=1
 
 movement_logic = (player) ->
 	unit = null
@@ -116,92 +39,92 @@ movement_logic = (player) ->
 	# player is holding down the up key
 	if player.up
 		# not on a snap axis
-		if on_snap_x(player) isnt player.position.x
+		if player.on_snap_x() isnt player.position.x
 			# if no obstacle there, move towards the snap coordinate
-			if can_go_up(player)
-				if on_snap_x(player) > player.position.x
-					move_right(player, unit)
+			if player.can_go_up()
+				if player.on_snap_x() > player.position.x
+					player.move_right(unit)
 				else
-					move_left(player, unit)
+					player.move_left(unit)
 			# otherwise, move in the opposite direction
 			else
-				if on_snap_x(player) > player.position.x
-					move_left(player, unit)
+				if player.on_snap_x() > player.position.x
+					player.move_left(unit)
 				else
-					move_right(player, unit)
+					player.move_right(unit)
 		# this is on a snap axis, so move normally IF no obstacle there
 		else
-			if can_go_up(player)
-				move_up(player, unit)
+			if player.can_go_up()
+				player.move_up(unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'up'
 	# player is holding down the down key
 	else if player.down
 		# not on a snap axis
-		if on_snap_x(player) isnt player.position.x
+		if player.on_snap_x() isnt player.position.x
 			# if no obstacle there, move towards the snap coordinate
-			if can_go_down(player)
-				if on_snap_x(player) > player.position.x
-					move_right(player, unit)
+			if player.can_go_down()
+				if player.on_snap_x() > player.position.x
+					player.move_right(unit)
 				else
-					move_left(player, unit)
+					player.move_left(unit)
 			# otherwise, move in the opposite direction
 			else
-				if on_snap_x(player) > player.position.x
-					move_left(player, unit)
+				if player.on_snap_x() > player.position.x
+					player.move_left(unit)
 				else
-					move_right(player, unit)
+					player.move_right(unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go_down(player)
-				move_down(player, unit)
+			if player.can_go_down()
+				player.move_down(unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'down'
 	# player is holding down the left key
 	else if player.left
 		# not on a snap axis
-		if on_snap_y(player) isnt player.position.y
+		if player.on_snap_y() isnt player.position.y
 			# if no obstacle there, move towards the snap coordinate
-			if can_go_left(player)
-				if on_snap_y(player) > player.position.y
-					move_down(player, unit)
+			if player.can_go_left()
+				if player.on_snap_y() > player.position.y
+					player.move_down(unit)
 				else
-					move_up(player, unit)
+					player.move_up(unit)
 			# otherwise, move in the opposite direction
 			else
-				if on_snap_y(player) > player.position.y
-					move_up(player, unit)
+				if player.on_snap_y() > player.position.y
+					player.move_up(unit)
 				else
-					move_down(player, unit)
+					player.move_down(unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go_left(player)
-				move_left(player, unit)
+			if player.can_go_left()
+				player.move_left(unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'left'
 	# player is holding down the right key
 	else if player.right
 		# not on a snap axis
-		if on_snap_y(player) isnt player.position.y
+		if player.on_snap_y() isnt player.position.y
 			# if no obstacle there, move towards the snap coordinate
-			if can_go_right(player)
-				if on_snap_y(player) > player.position.y
-					move_down(player, unit)
+			if player.can_go_right()
+				if player.on_snap_y() > player.position.y
+					player.move_down(unit)
 				else
-					move_up(player, unit)
+					player.move_up(unit)
 			# otherwise, move in the opposite direction
 			else
-				if on_snap_y(player) > player.position.y
-					move_up(player, unit)
+				if player.on_snap_y() > player.position.y
+					player.move_up(unit)
 				else
-					move_down(player, unit)
+					player.move_down(unit)
 		# this is on a snap axis, so move normally
 		else
-			if can_go_right(player)
-				move_right(player, unit)
+			if player.can_go_right()
+				player.move_right(unit)
 			# if we can't go that way, at least orient the player that way so it's responsive
 			else
 				player.facing = 'right'

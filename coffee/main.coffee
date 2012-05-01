@@ -4,20 +4,6 @@ objects = new Array()
 timer = null
 game_started = false
 
-Player = (pid, pos_x, pos_y, cont_up, cont_down, cont_left, cont_right, cont_drop) ->
-	this.id = pid
-	this.position = {x: pos_x, y: pos_y}
-	this.facing = 'down'
-	this.speed = 1
-	this.bomb_supply = {max_number: 1, number: 1, range: 1}
-	this.controls = {up: cont_up, down: cont_down, left: cont_left, right: cont_right, drop: cont_drop}
-	this.up = false
-	this.down = false
-	this.right = false
-	this.left = false
-	this.dead = false
-	this.movement = movement_logic(this)
-
 # initialize the game with 2 players
 init_game = ->
 	$('#stats').css('color', 'black')
@@ -76,7 +62,7 @@ game_logic = ->
 # determines the logic of walked over items and terrain
 # mainly upgrade behavior
 walkover_logic = (player) ->
-	coords = get_grid_coords(player)
+	coords = player.get_grid_coords()
 	# if it's an upgrade, modify the player in some way
 	if objects[coords.row][coords.col].type is 'upgrade'
 		kind = objects[coords.row][coords.col].kind
@@ -89,8 +75,6 @@ walkover_logic = (player) ->
 			$('#rangebombs'+(player.id+1)).text(player.bomb_supply.range)
 		else if kind is 'speed_up'&& player.bomb_supply.range < 10 # max speed
 			player.speed+=1
-			# make sure x and y position are odd
-			console.log player.position.x, player.position.y
 		
 		# delete the upgrade once you've picked it up
 		objects[coords.row][coords.col] = new Empty()
@@ -235,7 +219,7 @@ check_collisions = ->
 
 
 player_collision = (player) ->
-	coords = get_grid_coords(player)
+	coords = player.get_grid_coords()
 	r = coords.row
 	c = coords.col
 	
@@ -268,7 +252,7 @@ $(document).bind 'keydown', (e) ->
 			else if e.which is player.controls.right
 				player.right = true
 			else if e.which is player.controls.drop
-				coords = get_grid_coords(player)
+				coords = player.get_grid_coords()
 				if player.bomb_supply.number>0 && objects[coords.row][coords.col].type isnt 'bomb'
 					drop_bomb(coords.row, coords.col, player_id, player.bomb_supply.range)
 					player.bomb_supply.number -= 1
